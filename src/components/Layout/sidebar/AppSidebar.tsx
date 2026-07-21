@@ -34,11 +34,11 @@ const items = [
     url: "/times",
     icon: Users,
   },
-  {
-    title: "Quadras",
-    url: "/quadras",
-    icon: MapPin,
-  },
+ {
+  title: "Campos",
+  url: "/campos",
+  icon: MapPin,
+},
   {
     title: "Resultados",
     url: "/resultados",
