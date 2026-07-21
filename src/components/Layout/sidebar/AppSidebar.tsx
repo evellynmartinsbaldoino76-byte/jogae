@@ -1,8 +1,6 @@
 import {
   CalendarDays,
-  LayoutDashboard,
-  MapPin,
-  Trophy,
+  Home,
   Users,
 } from "lucide-react";
 
@@ -22,7 +20,7 @@ const items = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: LayoutDashboard,
+    icon: Home,
   },
   {
     title: "Jogos",
@@ -34,28 +32,19 @@ const items = [
     url: "/times",
     icon: Users,
   },
- {
-  title: "Campos",
-  url: "/campos",
-  icon: MapPin,
-},
-  {
-    title: "Resultados",
-    url: "/resultados",
-    icon: Trophy,
-  },
 ];
 
 
 export function AppSidebar() {
   return (
     <Sidebar>
+
       <SidebarContent>
 
         <SidebarGroup>
 
           <SidebarGroupLabel>
-            Jogaê
+            Jogaê ⚽
           </SidebarGroupLabel>
 
 
@@ -67,13 +56,18 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
 
                   <SidebarMenuButton>
-                    <item.icon />
 
-                    <span>
-                      {item.title}
-                    </span>
+  <a href={item.url} className="flex items-center gap-2">
 
-                  </SidebarMenuButton>
+    <item.icon />
+
+    <span>
+      {item.title}
+    </span>
+
+  </a>
+
+</SidebarMenuButton>
 
                 </SidebarMenuItem>
               ))}
@@ -85,6 +79,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
       </SidebarContent>
+
     </Sidebar>
   );
 }
