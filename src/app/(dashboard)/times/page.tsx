@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+
+
 import {
   Card,
   CardContent,
@@ -5,31 +10,59 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { Button } from "@/components/ui/button";
 
 import { Badge } from "@/components/ui/badge";
 
 
+import { NewTeamDialog } from "@/components/times/NewTeamDialog";
+
+
 export default function TimesPage() {
+
+
+  const [teams, setTeams] = useState([
+    "Feras FC",
+    "Lobos FC",
+  ]);
+
+
+  function handleCreateTeam(name: string) {
+
+    setTeams((oldTeams) => [
+      ...oldTeams,
+      name,
+    ]);
+
+  }
+
+
   return (
+
     <div className="space-y-6">
+
 
       <div className="flex items-center justify-between">
 
+
         <div>
+
           <h1 className="text-3xl font-bold">
             Times cadastrados ⚽
           </h1>
 
+
           <p className="text-muted-foreground">
             Organize os times que participam dos jogos.
           </p>
+
+
         </div>
 
 
-        <Button>
-          + Novo time
-        </Button>
+        <NewTeamDialog
+          onCreate={handleCreateTeam}
+        />
+
 
       </div>
 
@@ -38,58 +71,46 @@ export default function TimesPage() {
       <div className="grid gap-4 md:grid-cols-3">
 
 
-        <Card>
+        {teams.map((team) => (
 
-          <CardHeader>
-            <CardTitle>
-              Feras FC
-            </CardTitle>
-          </CardHeader>
+          <Card key={team}>
 
 
-          <CardContent>
+            <CardHeader>
 
-            <p className="text-muted-foreground">
-              Time cadastrado
-            </p>
+              <CardTitle>
+                {team}
+              </CardTitle>
 
-            <Badge className="mt-3">
-              Ativo
-            </Badge>
-
-          </CardContent>
-
-        </Card>
+            </CardHeader>
 
 
 
-        <Card>
-
-          <CardHeader>
-            <CardTitle>
-              Lobos FC
-            </CardTitle>
-          </CardHeader>
+            <CardContent>
 
 
-          <CardContent>
+              <p className="text-muted-foreground">
+                Time cadastrado
+              </p>
 
-            <p className="text-muted-foreground">
-              Time cadastrado
-            </p>
 
-            <Badge className="mt-3">
-              Ativo
-            </Badge>
+              <Badge className="mt-3">
+                Ativo
+              </Badge>
 
-          </CardContent>
 
-        </Card>
+            </CardContent>
 
+
+          </Card>
+
+        ))}
 
 
       </div>
 
+
     </div>
+
   );
 }
