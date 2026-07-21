@@ -9,21 +9,63 @@ export function DashboardShell({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
+
     <SidebarProvider>
 
-      <AppSidebar />
 
-      <main className="flex-1">
+      <div
+        className="
+        flex
+        min-h-screen
+        w-full
+        bg-gradient-to-br
+        from-[#061a16]
+        via-[#071525]
+        to-[#05070d]
+        "
+      >
 
-        <Header />
 
-        <div className="p-6">
-          {children}
-        </div>
+        <AppSidebar />
 
-      </main>
+
+
+        <main
+          className="
+          flex-1
+          overflow-hidden
+          "
+        >
+
+
+          <Header />
+
+
+
+          <div
+            className="
+            p-6
+            "
+          >
+
+            {children}
+
+
+          </div>
+
+
+
+        </main>
+
+
+
+      </div>
+
 
     </SidebarProvider>
+
   );
+
 }

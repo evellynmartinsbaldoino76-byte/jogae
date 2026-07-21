@@ -23,16 +23,47 @@ import {
 } from "@/components/ui/select";
 
 
-interface NewGameDialogProps {
-  teams: string[];
-  onCreate: (game: any) => void;
+interface Game {
+  id: string;
+  date: string;
+  time: string;
+  field: string;
+  team: string;
+  opponent: string;
+  status: string;
 }
 
 
+interface NewGameDialogProps {
+
+  teams: string[];
+
+  games: Game[];
+
+  onCreate: (game: Game) => void;
+
+}
+
+
+
+const horariosDisponiveis = [
+  "19:30",
+  "20:30",
+  "21:30",
+];
+
+
+
 export function NewGameDialog({
+
   teams,
+
+  games,
+
   onCreate,
+
 }: NewGameDialogProps) {
+
 
 
   const [date, setDate] = useState("");
@@ -47,16 +78,61 @@ export function NewGameDialog({
 
 
 
+
+
+
+  function horariosLivres() {
+
+
+    const ocupados = games
+
+      .filter(
+        (game) =>
+          game.date === date
+      )
+
+      .map(
+        (game) =>
+          game.time
+      );
+
+
+
+    return horariosDisponiveis.filter(
+
+      (horario) =>
+
+        !ocupados.includes(horario)
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+
   function handleSave() {
 
 
     if (!date || !time || !team) {
+
       return;
+
     }
 
 
 
+
+
+
     onCreate({
+
+      id: crypto.randomUUID(),
 
       date,
 
@@ -69,13 +145,18 @@ export function NewGameDialog({
       opponent:
         opponent || "Aguardando adversário",
 
-
       status:
-        opponent === "Aguardando adversário" || !opponent
-          ? "Aguardando adversário"
-          : "Confirmado",
+
+        opponent
+
+          ? "Confirmado"
+
+          : "Aguardando adversário",
 
     });
+
+
+
 
 
 
@@ -93,18 +174,33 @@ export function NewGameDialog({
 
 
 
+
+
+
+
   return (
 
     <Dialog>
 
 
-      <DialogTrigger>
 
-        <Button>
-          + Novo jogo
-        </Button>
+
+
+      <DialogTrigger
+
+        render={
+          <Button />
+        }
+
+      >
+
+        + Novo jogo
+
 
       </DialogTrigger>
+
+
+
 
 
 
@@ -113,13 +209,21 @@ export function NewGameDialog({
       <DialogContent>
 
 
+
         <DialogHeader>
 
+
           <DialogTitle>
+
             Novo jogo ⚽
+
           </DialogTitle>
 
+
         </DialogHeader>
+
+
+
 
 
 
@@ -137,9 +241,13 @@ export function NewGameDialog({
 
             value={date}
 
-            onChange={(e) =>
-              setDate(e.target.value)
-            }
+            onChange={(e) => {
+
+              setDate(e.target.value);
+
+              setTime("");
+
+            }}
 
           />
 
@@ -149,20 +257,41 @@ export function NewGameDialog({
 
 
 
+
+
           <Select
 
+            value={time}
+
             onValueChange={(value) =>
-              setTime(value as string)
+
+              setTime(value ?? "")
+
             }
+
+            disabled={!date}
 
           >
 
 
             <SelectTrigger>
 
-              <SelectValue placeholder="Escolha o horário" />
+
+              <SelectValue
+
+                placeholder={
+                  date
+                    ? "Escolha o horário"
+                    : "Escolha a data primeiro"
+                }
+
+              />
+
 
             </SelectTrigger>
+
+
+
 
 
 
@@ -170,33 +299,65 @@ export function NewGameDialog({
             <SelectContent>
 
 
-              <SelectItem value="19:30">
-
-                19:30
-
-              </SelectItem>
 
 
 
-              <SelectItem value="20:30">
-
-                20:30
-
-              </SelectItem>
+              {horariosLivres().length === 0 && (
 
 
+                <SelectItem
 
-              <SelectItem value="21:30">
+                  value="sem-horario"
 
-                21:30
+                  disabled
 
-              </SelectItem>
+                >
+
+                  Nenhum horário disponível
+
+                </SelectItem>
+
+
+              )}
+
+
+
+
+
+
+              {horariosLivres().map(
+
+                (horario) => (
+
+
+                  <SelectItem
+
+                    key={horario}
+
+                    value={horario}
+
+                  >
+
+                    {horario}
+
+                  </SelectItem>
+
+
+                )
+
+              )}
+
+
+
 
 
             </SelectContent>
 
 
+
           </Select>
+
+
 
 
 
@@ -209,7 +370,9 @@ export function NewGameDialog({
             🏟️ Campo:
 
             <strong className="ml-2">
+
               Campo principal
+
             </strong>
 
 
@@ -221,10 +384,15 @@ export function NewGameDialog({
 
 
 
+
           <Select
 
+            value={team}
+
             onValueChange={(value) =>
-              setTeam(value as string)
+
+              setTeam(value ?? "")
+
             }
 
           >
@@ -232,7 +400,13 @@ export function NewGameDialog({
 
             <SelectTrigger>
 
-              <SelectValue placeholder="Escolha o time" />
+
+              <SelectValue
+
+                placeholder="Escolha o time"
+
+              />
+
 
             </SelectTrigger>
 
@@ -240,8 +414,8 @@ export function NewGameDialog({
 
 
 
-            <SelectContent>
 
+            <SelectContent>
 
 
               {teams.map((item) => (
@@ -267,6 +441,7 @@ export function NewGameDialog({
             </SelectContent>
 
 
+
           </Select>
 
 
@@ -279,8 +454,12 @@ export function NewGameDialog({
 
           <Select
 
+            value={opponent}
+
             onValueChange={(value) =>
-              setOpponent(value as string)
+
+              setOpponent(value ?? "")
+
             }
 
           >
@@ -288,9 +467,16 @@ export function NewGameDialog({
 
             <SelectTrigger>
 
-              <SelectValue placeholder="Escolha o adversário" />
+
+              <SelectValue
+
+                placeholder="Escolha o adversário"
+
+              />
+
 
             </SelectTrigger>
+
 
 
 
@@ -300,7 +486,7 @@ export function NewGameDialog({
 
 
 
-              <SelectItem value="Aguardando adversário">
+              <SelectItem value="">
 
                 Aguardando adversário
 
@@ -333,7 +519,10 @@ export function NewGameDialog({
             </SelectContent>
 
 
+
           </Select>
+
+
 
 
 
@@ -357,12 +546,18 @@ export function NewGameDialog({
 
 
 
+
         </div>
 
 
 
 
+
       </DialogContent>
+
+
+
+
 
 
     </Dialog>

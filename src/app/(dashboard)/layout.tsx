@@ -1,5 +1,7 @@
 import { DashboardShell } from "@/components/layout/DashboardShell";
 
+import { GamesProvider } from "@/context/GamesContext";
+
 
 export default function DashboardLayout({
   children,
@@ -7,8 +9,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <DashboardShell>
-      {children}
-    </DashboardShell>
+
+    <GamesProvider>
+
+      <DashboardShell>
+
+        {children}
+
+      </DashboardShell>
+
+    </GamesProvider>
+
   );
 }

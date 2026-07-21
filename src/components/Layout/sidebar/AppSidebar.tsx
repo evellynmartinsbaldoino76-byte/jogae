@@ -1,3 +1,5 @@
+"use client";
+
 import {
   CalendarDays,
   Home,
@@ -16,6 +18,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
 
 
 
@@ -50,22 +53,73 @@ const items = [
 
 
 
+
 export function AppSidebar() {
+
 
   return (
 
-    <Sidebar>
+    <Sidebar
+
+      className="
+      border-r
+      border-white/10
+      bg-gradient-to-b
+      from-[#061a16]
+      via-[#071525]
+      to-[#05070d]
+      "
+
+    >
 
 
-      <SidebarContent>
+
+      <SidebarContent
+
+        className="
+        bg-transparent
+        "
+
+      >
+
 
 
         <SidebarGroup>
 
 
-          <SidebarGroupLabel>
-            Jogaê ⚽
+
+
+          <SidebarGroupLabel
+
+            className="
+            px-5
+            py-6
+            text-xl
+            font-bold
+            text-white
+            "
+
+          >
+
+
+            <span className="text-emerald-400">
+
+              ⚽
+
+            </span>
+
+
+            <span className="ml-2">
+
+              Jogaê
+
+            </span>
+
+
           </SidebarGroupLabel>
+
+
+
 
 
 
@@ -88,27 +142,55 @@ export function AppSidebar() {
 
 
 
-                  <SidebarMenuButton>
+
+                  <SidebarMenuButton
+
+                    className="
+                    mx-3
+                    rounded-xl
+                    text-slate-300
+                    transition-all
+                    hover:bg-emerald-400/10
+                    hover:text-emerald-400
+                    "
+
+                  >
+
 
 
                     <a
 
                       href={item.url}
 
-                      className="flex items-center gap-2"
+                      className="
+                      flex
+                      w-full
+                      items-center
+                      gap-3
+                      "
 
                     >
 
 
-                      <item.icon />
+
+                      <item.icon
+
+                        size={20}
+
+                      />
+
 
 
                       <span>
+
                         {item.title}
+
                       </span>
 
 
+
                     </a>
+
 
 
 
@@ -119,7 +201,9 @@ export function AppSidebar() {
                 </SidebarMenuItem>
 
 
+
               ))}
+
 
 
 
@@ -127,7 +211,9 @@ export function AppSidebar() {
 
 
 
+
           </SidebarGroupContent>
+
 
 
 
@@ -135,7 +221,9 @@ export function AppSidebar() {
 
 
 
+
       </SidebarContent>
+
 
 
 
