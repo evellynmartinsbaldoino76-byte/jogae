@@ -1,6 +1,7 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 import { AppSidebar } from "./sidebar/AppSidebar";
+import { Header } from "./header/Header";
 
 
 export function DashboardShell({
@@ -15,9 +16,7 @@ export function DashboardShell({
 
       <main className="flex-1">
 
-        <div className="flex items-center h-14 border-b px-4">
-          <SidebarTrigger />
-        </div>
+        <Header />
 
         <div className="p-6">
           {children}
