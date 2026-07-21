@@ -14,11 +14,11 @@ export default function DashboardPage() {
 
       <div>
         <h1 className="text-3xl font-bold">
-          Olá, Evellyn 👋
+          Olá, Gian 👋
         </h1>
 
         <p className="text-muted-foreground">
-          Aqui está o resumo do seu Jogaê.
+          Aqui estão os resumos dos jogos agendados.
         </p>
       </div>
 
