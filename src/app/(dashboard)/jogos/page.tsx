@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-
 import {
   Card,
   CardContent,
@@ -10,11 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 import { Badge } from "@/components/ui/badge";
 
-
 import { NewGameDialog } from "@/components/jogos/NewGameDialog";
+
+import { teams } from "@/lib/teams";
 
 
 
@@ -22,14 +21,6 @@ export default function JogosPage() {
 
 
   const [games, setGames] = useState<any[]>([]);
-
-
-
-  const teams = [
-    "Feras FC",
-    "Lobos FC",
-  ];
-
 
 
 
@@ -51,7 +42,6 @@ export default function JogosPage() {
 
 
 
-
   return (
 
     <div className="space-y-6">
@@ -67,7 +57,6 @@ export default function JogosPage() {
           <h1 className="text-3xl font-bold">
             Jogos agendados ⚽
           </h1>
-
 
 
           <p className="text-muted-foreground">
@@ -97,7 +86,6 @@ export default function JogosPage() {
 
 
 
-
       {games.length === 0 && (
 
         <Card>
@@ -119,7 +107,6 @@ export default function JogosPage() {
         </Card>
 
       )}
-
 
 
 
@@ -158,7 +145,7 @@ export default function JogosPage() {
 
 
 
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-3">
 
 
               <p>
@@ -185,6 +172,7 @@ export default function JogosPage() {
 
 
             </CardContent>
+
 
 
           </Card>

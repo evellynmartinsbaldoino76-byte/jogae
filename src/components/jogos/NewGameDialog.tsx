@@ -45,6 +45,8 @@ export function NewGameDialog({
 
 
 
+
+
   function handleSave() {
 
 
@@ -65,14 +67,13 @@ export function NewGameDialog({
       team,
 
       opponent:
-        opponent.trim()
-          ? opponent
-          : "Aguardando adversário",
+        opponent || "Aguardando adversário",
+
 
       status:
-        opponent.trim()
-          ? "Confirmado"
-          : "Aguardando adversário",
+        opponent === "Aguardando adversário" || !opponent
+          ? "Aguardando adversário"
+          : "Confirmado",
 
     });
 
@@ -108,6 +109,7 @@ export function NewGameDialog({
 
 
 
+
       <DialogContent>
 
 
@@ -127,6 +129,8 @@ export function NewGameDialog({
 
 
 
+
+
           <Input
 
             type="date"
@@ -138,6 +142,8 @@ export function NewGameDialog({
             }
 
           />
+
+
 
 
 
@@ -196,6 +202,8 @@ export function NewGameDialog({
 
 
 
+
+
           <div className="rounded-md border p-3 text-sm">
 
             🏟️ Campo:
@@ -203,6 +211,7 @@ export function NewGameDialog({
             <strong className="ml-2">
               Campo principal
             </strong>
+
 
           </div>
 
@@ -234,6 +243,7 @@ export function NewGameDialog({
             <SelectContent>
 
 
+
               {teams.map((item) => (
 
 
@@ -253,6 +263,7 @@ export function NewGameDialog({
               ))}
 
 
+
             </SelectContent>
 
 
@@ -264,17 +275,65 @@ export function NewGameDialog({
 
 
 
-          <Input
 
-            placeholder="Adversário (opcional)"
 
-            value={opponent}
+          <Select
 
-            onChange={(e) =>
-              setOpponent(e.target.value)
+            onValueChange={(value) =>
+              setOpponent(value as string)
             }
 
-          />
+          >
+
+
+            <SelectTrigger>
+
+              <SelectValue placeholder="Escolha o adversário" />
+
+            </SelectTrigger>
+
+
+
+
+
+            <SelectContent>
+
+
+
+              <SelectItem value="Aguardando adversário">
+
+                Aguardando adversário
+
+              </SelectItem>
+
+
+
+
+
+              {teams.map((item) => (
+
+
+                <SelectItem
+
+                  key={item}
+
+                  value={item}
+
+                >
+
+                  {item}
+
+                </SelectItem>
+
+
+              ))}
+
+
+
+            </SelectContent>
+
+
+          </Select>
 
 
 
@@ -302,8 +361,8 @@ export function NewGameDialog({
 
 
 
-      </DialogContent>
 
+      </DialogContent>
 
 
     </Dialog>
