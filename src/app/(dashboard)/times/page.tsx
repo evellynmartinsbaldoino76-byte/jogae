@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-
 import {
   Card,
   CardContent,
@@ -10,15 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 import { Badge } from "@/components/ui/badge";
-
 
 import { NewTeamDialog } from "@/components/times/NewTeamDialog";
 
 
 export default function TimesPage() {
-
 
   const [teams, setTeams] = useState([
     "Feras FC",
@@ -28,11 +24,24 @@ export default function TimesPage() {
 
   function handleCreateTeam(name: string) {
 
-    setTeams((oldTeams) => [
-      ...oldTeams,
+    const exists = teams.some(
+      (team) =>
+        team.toLowerCase() === name.toLowerCase()
+    );
+
+
+    if (exists) {
+      return false;
+    }
+
+
+    setTeams((current) => [
+      ...current,
       name,
     ]);
 
+
+    return true;
   }
 
 
@@ -52,11 +61,11 @@ export default function TimesPage() {
 
 
           <p className="text-muted-foreground">
-            Organize os times que participam dos jogos.
+            {teams.length} times ativos
           </p>
 
-
         </div>
+
 
 
         <NewTeamDialog
@@ -75,7 +84,6 @@ export default function TimesPage() {
 
           <Card key={team}>
 
-
             <CardHeader>
 
               <CardTitle>
@@ -85,9 +93,7 @@ export default function TimesPage() {
             </CardHeader>
 
 
-
             <CardContent>
-
 
               <p className="text-muted-foreground">
                 Time cadastrado
@@ -113,4 +119,5 @@ export default function TimesPage() {
     </div>
 
   );
+
 }

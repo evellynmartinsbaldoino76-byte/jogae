@@ -16,36 +16,69 @@ import { Input } from "@/components/ui/input";
 
 
 interface NewTeamDialogProps {
-  onCreate: (name: string) => void;
+  onCreate: (name: string) => boolean;
 }
 
 
-export function NewTeamDialog({ onCreate }: NewTeamDialogProps) {
+export function NewTeamDialog({
+  onCreate,
+}: NewTeamDialogProps) {
+
 
   const [name, setName] = useState("");
+
+  const [error, setError] = useState("");
+
 
 
   function handleSave() {
 
-    if (!name.trim()) return;
+
+    if (!name.trim()) {
+
+      setError("Digite o nome do time.");
+
+      return;
+
+    }
 
 
-    onCreate(name);
+
+    const created = onCreate(name);
+
+
+
+    if (!created) {
+
+      setError("Este time já está cadastrado.");
+
+      return;
+
+    }
+
 
 
     setName("");
+
+    setError("");
+
   }
 
 
+
   return (
+
     <Dialog>
+
 
       <DialogTrigger>
         + Novo time
       </DialogTrigger>
 
 
+
       <DialogContent>
+
 
         <DialogHeader>
 
@@ -56,21 +89,48 @@ export function NewTeamDialog({ onCreate }: NewTeamDialogProps) {
         </DialogHeader>
 
 
+
         <div className="space-y-4">
 
 
           <Input
+
             placeholder="Nome do time"
+
             value={name}
-            onChange={(e) => setName(e.target.value)}
+
+            onChange={(e) => {
+
+              setName(e.target.value);
+
+              setError("");
+
+            }}
+
           />
 
 
+
+          {error && (
+
+            <p className="text-sm text-red-500">
+              ⚠ {error}
+            </p>
+
+          )}
+
+
+
           <Button
+
             onClick={handleSave}
+
             className="w-full"
+
           >
+
             Salvar time
+
           </Button>
 
 
@@ -79,6 +139,8 @@ export function NewTeamDialog({ onCreate }: NewTeamDialogProps) {
 
       </DialogContent>
 
+
     </Dialog>
+
   );
 }
