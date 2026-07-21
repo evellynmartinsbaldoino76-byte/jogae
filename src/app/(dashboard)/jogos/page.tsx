@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+
+
 import {
   Card,
   CardContent,
@@ -5,73 +10,198 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+
 import { Badge } from "@/components/ui/badge";
 
-import { Button } from "@/components/ui/button";
+
+import { NewGameDialog } from "@/components/jogos/NewGameDialog";
+
 
 
 export default function JogosPage() {
+
+
+  const [games, setGames] = useState<any[]>([]);
+
+
+
+  const teams = [
+    "Feras FC",
+    "Lobos FC",
+  ];
+
+
+
+
+
+  function handleCreateGame(game: any) {
+
+
+    setGames((current) => [
+
+      ...current,
+
+      game,
+
+    ]);
+
+  }
+
+
+
+
+
+
   return (
+
     <div className="space-y-6">
+
+
 
       <div className="flex items-center justify-between">
 
+
         <div>
+
+
           <h1 className="text-3xl font-bold">
             Jogos agendados ⚽
           </h1>
 
+
+
           <p className="text-muted-foreground">
-            Organize e acompanhe todas as partidas.
+            Aqui estão os resumos dos jogos agendados.
           </p>
+
+
         </div>
 
 
-        <Button>
-          + Novo jogo
-        </Button>
+
+
+
+        <NewGameDialog
+
+          teams={teams}
+
+          onCreate={handleCreateGame}
+
+        />
+
 
       </div>
 
 
 
-      <Card>
-
-        <CardHeader>
-          <CardTitle>
-            Feras FC x Lobos FC
-          </CardTitle>
-        </CardHeader>
 
 
-        <CardContent>
 
-          <div className="space-y-2">
 
-            <p>
-              📅 22/07/2026
-            </p>
+      {games.length === 0 && (
 
-            <p>
-              ⏰ 20:30
-            </p>
+        <Card>
 
-            <p>
-              🏟 Campo Central
+
+          <CardContent className="pt-6">
+
+
+            <p className="text-muted-foreground">
+
+              Nenhum jogo agendado.
+
             </p>
 
 
-            <Badge>
-              Confirmado
-            </Badge>
+          </CardContent>
 
-          </div>
 
-        </CardContent>
+        </Card>
 
-      </Card>
+      )}
+
+
+
+
+
+
+
+      <div className="grid gap-4 md:grid-cols-2">
+
+
+
+        {games.map((game, index) => (
+
+
+
+          <Card key={index}>
+
+
+            <CardHeader>
+
+
+              <CardTitle>
+
+                {game.team}
+
+                {" x "}
+
+                {game.opponent}
+
+
+              </CardTitle>
+
+
+            </CardHeader>
+
+
+
+
+
+            <CardContent className="space-y-2">
+
+
+              <p>
+                📅 {game.date}
+              </p>
+
+
+              <p>
+                🕒 {game.time}
+              </p>
+
+
+              <p>
+                🏟️ {game.field}
+              </p>
+
+
+
+              <Badge>
+
+                {game.status}
+
+              </Badge>
+
+
+            </CardContent>
+
+
+          </Card>
+
+
+
+        ))}
+
+
+
+      </div>
+
+
 
 
     </div>
+
   );
+
 }
