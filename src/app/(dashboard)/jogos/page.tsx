@@ -273,13 +273,10 @@ export default function JogosPage() {
               <CardContent className="space-y-3 text-slate-300">
 
 
-                <p className="flex items-center gap-2">
-
-                  <CalendarDays size={18} />
-
-                  {game.date}
-
-                </p>
+               <p className="flex items-center gap-2">
+  <CalendarDays size={18} />
+  {new Date(game.date + "T00:00:00").toLocaleDateString("pt-BR")}
+</p>
 
 
 
