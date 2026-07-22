@@ -54,14 +54,17 @@ export default function DashboardPage() {
 
 
   const nextGame =
-    games.length > 0
-      ? games[0]
-      : null;
+  [...games]
+    .sort((a, b) => {
+      const dataA = new Date(`${a.date}T${a.time}`);
+      const dataB = new Date(`${b.date}T${b.time}`);
 
+      return dataA.getTime() - dataB.getTime();
+    })[0] ?? null;
 
-
-
-
+    function formatDate(date: string) {
+  return new Date(`${date}T00:00:00`).toLocaleDateString("pt-BR");
+}
 
   function novoJogo() {
 
@@ -412,7 +415,7 @@ export default function DashboardPage() {
 
                   <p>
 
-                    🕒 {nextGame.date} às {nextGame.time}
+                   🕒 {formatDate(nextGame.date)} às {nextGame.time}
 
                   </p>
 
