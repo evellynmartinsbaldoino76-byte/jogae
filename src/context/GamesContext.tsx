@@ -29,8 +29,6 @@ export interface Game {
 
 
 
-
-
 interface GamesContextData {
 
   games: Game[];
@@ -50,13 +48,8 @@ interface GamesContextData {
 
 
 
-
-
 const GamesContext =
   createContext<GamesContextData | null>(null);
-
-
-
 
 
 
@@ -72,10 +65,8 @@ export function GamesProvider({
 }) {
 
 
-
   const [games, setGames] =
     useState<Game[]>([]);
-
 
 
   const [loading, setLoading] =
@@ -85,16 +76,9 @@ export function GamesProvider({
 
 
 
-
-
-
-  // Buscar jogos do banco
-
   async function loadGames() {
 
-
     try {
-
 
       const response =
         await fetch("/api/games");
@@ -109,7 +93,6 @@ export function GamesProvider({
 
     } catch (error) {
 
-
       console.error(
         "Erro ao carregar jogos:",
         error
@@ -118,12 +101,9 @@ export function GamesProvider({
 
     } finally {
 
-
       setLoading(false);
 
-
     }
-
 
   }
 
@@ -131,14 +111,9 @@ export function GamesProvider({
 
 
 
-
-
-
   useEffect(() => {
 
-
     loadGames();
-
 
   }, []);
 
@@ -147,10 +122,6 @@ export function GamesProvider({
 
 
 
-
-
-
-  // Criar jogo
 
   async function addGame(game: Game) {
 
@@ -186,7 +157,6 @@ export function GamesProvider({
 
     ]);
 
-
   }
 
 
@@ -195,9 +165,6 @@ export function GamesProvider({
 
 
 
-
-
-  // Atualizar jogo
 
   async function updateGame(
 
@@ -208,58 +175,59 @@ export function GamesProvider({
   ) {
 
 
-
-    async function updateGame(
-
-  id: string,
-
-  updatedGame: Game
-
-) {
+    const response =
+      await fetch("/api/games", {
 
 
-  const response = await fetch("/api/games", {
+        method: "PUT",
 
-    method: "PUT",
 
-    headers: {
+        headers: {
 
-      "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
 
-    },
+        },
 
-    body: JSON.stringify({
 
-      ...updatedGame,
+        body: JSON.stringify({
 
-      id,
+          ...updatedGame,
 
-    }),
+          id,
 
-  });
+        }),
+
+
+      });
 
 
 
-  const game = await response.json();
+
+    const game =
+      await response.json();
 
 
 
-  setGames((current) =>
-
-    current.map((item) =>
-
-      item.id === id
-
-        ? game
-
-        : item
-
-    )
-
-  );
 
 
-}
+    setGames((current) =>
+
+
+      current.map((item) =>
+
+
+        item.id === id
+
+          ? game
+
+          : item
+
+
+      )
+
+
+    );
 
 
   }
@@ -270,9 +238,6 @@ export function GamesProvider({
 
 
 
-
-
-  // Remover jogo
 
   async function removeGame(
 
@@ -309,7 +274,9 @@ export function GamesProvider({
 
 
 
+
     setGames((current) =>
+
 
       current.filter(
 
@@ -318,6 +285,7 @@ export function GamesProvider({
           game.id !== id
 
       )
+
 
     );
 
@@ -334,9 +302,12 @@ export function GamesProvider({
 
   return (
 
+
     <GamesContext.Provider
 
+
       value={{
+
 
         games,
 
@@ -346,9 +317,12 @@ export function GamesProvider({
 
         removeGame,
 
+
       }}
 
+
     >
+
 
       {children}
 
@@ -358,9 +332,8 @@ export function GamesProvider({
 
   );
 
+
 }
-
-
 
 
 
@@ -393,4 +366,4 @@ export function useGames() {
   return context;
 
 
-}
+} 

@@ -58,10 +58,6 @@ interface NewGameDialogProps {
     game: Game
   ) => void;
 
-  initialDate?: string;
-
-  initialTime?: string;
-
   editingGame?: Game | null;
 
   open?: boolean;
@@ -81,13 +77,10 @@ interface NewGameDialogProps {
 const horariosDisponiveis = [
 
   "19:30",
-
   "20:30",
-
   "21:30",
 
 ];
-
 
 
 
@@ -106,10 +99,6 @@ export function NewGameDialog({
 
   onUpdate,
 
-  initialDate,
-
-  initialTime,
-
   editingGame,
 
   open,
@@ -122,13 +111,23 @@ export function NewGameDialog({
 
 
 
-  const [date, setDate] = useState("");
+  const [date, setDate] =
+    useState("");
 
-  const [time, setTime] = useState("");
 
-  const [team, setTeam] = useState("");
 
-  const [opponent, setOpponent] = useState("");
+  const [time, setTime] =
+    useState("");
+
+
+
+  const [team, setTeam] =
+    useState("");
+
+
+
+  const [opponent, setOpponent] =
+    useState("");
 
 
 
@@ -149,9 +148,11 @@ export function NewGameDialog({
 
       setTeam(editingGame.team);
 
+
       setOpponent(
 
-        editingGame.opponent === "Aguardando adversário"
+        editingGame.opponent ===
+        "Aguardando adversário"
 
           ? ""
 
@@ -160,31 +161,22 @@ export function NewGameDialog({
       );
 
 
-      return;
+    } else {
+
+
+      setDate("");
+
+      setTime("");
+
+      setTeam("");
+
+      setOpponent("");
+
 
     }
 
 
-
-    setDate(initialDate ?? "");
-
-    setTime(initialTime ?? "");
-
-    setTeam("");
-
-    setOpponent("");
-
-
-
-  }, [
-
-    editingGame,
-
-    initialDate,
-
-    initialTime
-
-  ]);
+  }, [editingGame]);
 
 
 
@@ -239,6 +231,7 @@ export function NewGameDialog({
   function handleSave() {
 
 
+
     if (!date || !time || !team) {
 
       return;
@@ -254,21 +247,28 @@ export function NewGameDialog({
 
       id:
 
-        editingGame
+        editingGame?.id ??
 
-          ? editingGame.id
-
-          : crypto.randomUUID(),
+        crypto.randomUUID(),
 
 
 
       date,
 
+
       time,
 
-      field: "Campo principal",
+
+
+      field:
+
+        "Associação da Polícia",
+
+
 
       team,
+
+
 
       opponent:
 
@@ -289,6 +289,7 @@ export function NewGameDialog({
 
 
     };
+
 
 
 
@@ -321,7 +322,6 @@ export function NewGameDialog({
 
 
 
-
     setDate("");
 
     setTime("");
@@ -335,11 +335,8 @@ export function NewGameDialog({
     onOpenChange?.(false);
 
 
+
   }
-
-
-
-
 
 
 
@@ -351,6 +348,8 @@ export function NewGameDialog({
 
   return (
 
+
+
     <Dialog
 
       open={open}
@@ -361,21 +360,23 @@ export function NewGameDialog({
 
 
 
+
+
       {showTrigger && (
 
-        <DialogTrigger
 
-          render={
+        <DialogTrigger>
 
-            <Button />
 
-          }
+          <Button>
 
-        >
+            + Novo jogo
 
-          + Novo jogo
+          </Button>
+
 
         </DialogTrigger>
+
 
       )}
 
@@ -415,10 +416,7 @@ export function NewGameDialog({
 
 
 
-
         <div className="space-y-4">
-
-
 
 
 
@@ -430,17 +428,14 @@ export function NewGameDialog({
 
             value={date}
 
-            onChange={(e) => {
+            onChange={(e)=>
 
+              setDate(e.target.value)
 
-              setDate(e.target.value);
-
-              setTime("");
-
-
-            }}
+            }
 
           />
+
 
 
 
@@ -453,7 +448,7 @@ export function NewGameDialog({
 
             value={time}
 
-            onValueChange={(value) =>
+            onValueChange={(value)=>
 
               setTime(value ?? "")
 
@@ -479,31 +474,26 @@ export function NewGameDialog({
 
 
 
-
             <SelectContent>
 
 
-              {horariosLivres().map(
-
-                (horario) => (
+              {horariosLivres().map((horario)=>(
 
 
-                  <SelectItem
+                <SelectItem
 
-                    key={horario}
+                  key={horario}
 
-                    value={horario}
+                  value={horario}
 
-                  >
+                >
 
-                    {horario}
+                  {horario}
 
-                  </SelectItem>
+                </SelectItem>
 
 
-                )
-
-              )}
+              ))}
 
 
             </SelectContent>
@@ -521,11 +511,11 @@ export function NewGameDialog({
           <div className="rounded-md border p-3 text-sm">
 
 
-            🏟️ Campo:
+            📍 Local:
 
             <strong className="ml-2">
 
-              Campo principal
+              Associação da Polícia
 
             </strong>
 
@@ -543,7 +533,7 @@ export function NewGameDialog({
 
             value={team}
 
-            onValueChange={(value) =>
+            onValueChange={(value)=>
 
               setTeam(value ?? "")
 
@@ -557,7 +547,7 @@ export function NewGameDialog({
 
               <SelectValue
 
-                placeholder="Escolha o time"
+                placeholder="Escolha seu time"
 
               />
 
@@ -571,7 +561,7 @@ export function NewGameDialog({
             <SelectContent>
 
 
-              {teams.map((item) => (
+              {teams.map((item)=>(
 
 
                 <SelectItem
@@ -606,7 +596,7 @@ export function NewGameDialog({
 
             value={opponent}
 
-            onValueChange={(value) =>
+            onValueChange={(value)=>
 
               setOpponent(value ?? "")
 
@@ -634,7 +624,8 @@ export function NewGameDialog({
             <SelectContent>
 
 
-              <SelectItem value="">
+
+              <SelectItem value="Aguardando adversário">
 
                 Aguardando adversário
 
@@ -644,23 +635,34 @@ export function NewGameDialog({
 
 
 
-              {teams.map((item) => (
+              {teams
+
+                .filter(
+
+                  (item)=>
+
+                    item !== team
+
+                )
+
+                .map((item)=>(
 
 
-                <SelectItem
+                  <SelectItem
 
-                  key={item}
+                    key={item}
 
-                  value={item}
+                    value={item}
 
-                >
+                  >
 
-                  {item}
+                    {item}
 
-                </SelectItem>
+                  </SelectItem>
 
 
-              ))}
+                ))}
+
 
 
             </SelectContent>
@@ -716,6 +718,8 @@ export function NewGameDialog({
 
     </Dialog>
 
+
   );
+
 
 }

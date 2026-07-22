@@ -5,8 +5,11 @@ import {
   Clock3,
   MapPin,
   Shield,
+  Trash2,
+  Pencil,
 } from "lucide-react";
 
+import { useEffect, useState } from "react";
 
 import {
   Card,
@@ -15,17 +18,34 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 import { Badge } from "@/components/ui/badge";
 
+import { Button } from "@/components/ui/button";
 
 import { NewGameDialog } from "@/components/jogos/NewGameDialog";
 
-
-import { teams } from "@/lib/teams";
-
-
 import { useGames } from "@/context/GamesContext";
+
+
+
+
+interface Game {
+
+  id: string;
+
+  date: string;
+
+  time: string;
+
+  field: string;
+
+  team: string;
+
+  opponent: string;
+
+  status: string;
+
+}
 
 
 
@@ -34,7 +54,94 @@ import { useGames } from "@/context/GamesContext";
 export default function JogosPage() {
 
 
-  const { games, addGame } = useGames();
+
+  const {
+    games,
+    addGame,
+    removeGame,
+    updateGame,
+  } = useGames();
+
+
+
+
+
+  const [teams, setTeams] =
+    useState<string[]>([]);
+
+
+
+  const [editingGame, setEditingGame] =
+    useState<Game | null>(null);
+
+
+
+  const [openEdit, setOpenEdit] =
+    useState(false);
+
+
+
+
+
+
+
+  useEffect(() => {
+
+
+    async function loadTeams() {
+
+
+      try {
+
+
+        const response =
+          await fetch("/api/teams");
+
+
+
+        const data =
+          await response.json();
+
+
+
+
+        setTeams(
+
+          data.map(
+            (team: { name: string }) =>
+              team.name
+          )
+
+        );
+
+
+
+      } catch (error) {
+
+
+        console.error(
+          "Erro ao carregar times:",
+          error
+        );
+
+
+      }
+
+
+    }
+
+
+
+
+    loadTeams();
+
+
+
+  }, []);
+
+
+
+
 
 
 
@@ -43,13 +150,11 @@ export default function JogosPage() {
   return (
 
 
+
     <div className="space-y-8">
 
 
 
-
-
-      {/* Cabeçalho */}
 
 
       <div className="flex items-center justify-between">
@@ -83,16 +188,20 @@ export default function JogosPage() {
 
 
 
+
         <NewGameDialog
+
 
           teams={teams}
 
+
           games={games}
+
 
           onCreate={addGame}
 
-        />
 
+        />
 
 
 
@@ -104,46 +213,34 @@ export default function JogosPage() {
 
 
 
-      {/* Lista de jogos */}
 
 
-      <div
-
-        className="
+      <div className="
         grid
         gap-6
         md:grid-cols-2
         xl:grid-cols-3
-        "
-
-      >
-
+      ">
 
 
 
         {games.length === 0 ? (
 
 
-          <Card
 
-            className="
+          <Card className="
             border-white/10
             bg-white/5
             backdrop-blur-xl
-            "
-
-          >
+          ">
 
 
-            <CardContent
-
-              className="
+            <CardContent className="
               p-6
               text-center
               text-slate-400
-              "
+            ">
 
-            >
 
               Nenhum jogo agendado.
 
@@ -168,10 +265,9 @@ export default function JogosPage() {
               key={game.id}
 
               className="
-              border-white/10
-              bg-white/5
-              backdrop-blur-xl
-              shadow-xl
+                border-white/10
+                bg-white/5
+                backdrop-blur-xl
               "
 
             >
@@ -179,19 +275,16 @@ export default function JogosPage() {
 
 
 
+
               <CardHeader>
 
 
-                <CardTitle
 
-                  className="
+                <CardTitle className="
                   flex
-                  items-center
                   justify-between
                   text-white
-                  "
-
-                >
+                ">
 
 
 
@@ -203,14 +296,8 @@ export default function JogosPage() {
 
 
 
-                  <Badge
 
-                    className="
-                    bg-emerald-500/20
-                    text-emerald-400
-                    "
-
-                  >
+                  <Badge>
 
                     {game.status}
 
@@ -221,6 +308,7 @@ export default function JogosPage() {
                 </CardTitle>
 
 
+
               </CardHeader>
 
 
@@ -228,38 +316,45 @@ export default function JogosPage() {
 
 
 
-              <CardContent
 
-                className="
+
+
+              <CardContent className="
                 space-y-3
                 text-slate-300
-                "
-
-              >
+              ">
 
 
 
-                <p className="flex items-center gap-2">
 
-                  <CalendarDays size={18} />
+                <p className="flex gap-2 items-center">
+
+
+                  <CalendarDays size={18}/>
+
 
                   {game.date}
 
 
+
                 </p>
 
 
 
 
 
-                <p className="flex items-center gap-2">
 
 
-                  <Clock3 size={18} />
+                <p className="flex gap-2 items-center">
+
+
+                  <Clock3 size={18}/>
+
 
                   {game.time}
 
 
+
                 </p>
 
 
@@ -267,29 +362,137 @@ export default function JogosPage() {
 
 
 
-                <p className="flex items-center gap-2">
 
 
-                  <MapPin size={18} />
+                <p className="flex gap-2 items-center">
+
+
+                  <MapPin size={18}/>
+
 
                   {game.field}
 
 
+
                 </p>
 
 
 
 
 
-                <p className="flex items-center gap-2">
 
 
-                  <Shield size={18} />
+
+                <p className="flex gap-2 items-center">
+
+
+                  <Shield size={18}/>
+
 
                   {game.team}
 
 
+
                 </p>
+
+
+
+
+
+
+
+
+
+                <div className="flex gap-2 pt-4">
+
+
+
+
+
+                  <Button
+
+
+                    variant="outline"
+
+
+                    className="flex-1"
+
+
+                    onClick={() => {
+
+
+                      setEditingGame(game);
+
+
+                      setOpenEdit(true);
+
+
+
+                    }}
+
+
+
+                  >
+
+
+
+                    <Pencil
+                      size={16}
+                      className="mr-2"
+                    />
+
+                    Editar
+
+
+
+                  </Button>
+
+
+
+
+
+
+
+
+
+                  <Button
+
+
+                    variant="destructive"
+
+
+                    className="flex-1"
+
+
+                    onClick={() =>
+
+                      removeGame(game.id)
+
+                    }
+
+
+                  >
+
+
+
+                    <Trash2
+                      size={16}
+                      className="mr-2"
+                    />
+
+
+                    Excluir
+
+
+
+                  </Button>
+
+
+
+
+
+                </div>
+
 
 
 
@@ -307,6 +510,7 @@ export default function JogosPage() {
           ))
 
 
+
         )}
 
 
@@ -317,7 +521,104 @@ export default function JogosPage() {
 
 
 
+
+
+
+
+      {editingGame && (
+
+
+
+        <NewGameDialog
+
+
+
+          teams={teams}
+
+
+
+          games={games}
+
+
+
+          onCreate={addGame}
+
+
+
+          onUpdate={async (
+
+            id,
+
+            game
+
+          ) => {
+
+
+
+            await updateGame(
+
+              id,
+
+              game
+
+            );
+
+
+
+            setEditingGame(null);
+
+            setOpenEdit(false);
+
+
+
+          }}
+
+
+
+          editingGame={editingGame}
+
+
+
+          open={openEdit}
+
+
+
+          onOpenChange={(open) => {
+
+
+
+            setOpenEdit(open);
+
+
+
+            if (!open) {
+
+
+              setEditingGame(null);
+
+
+            }
+
+
+
+          }}
+
+
+
+          showTrigger={false}
+
+
+
+        />
+
+
+
+      )}
+
+
+
     </div>
+
 
 
   );
