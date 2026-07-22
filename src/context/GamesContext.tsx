@@ -3,76 +3,394 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
   ReactNode,
 } from "react";
 
+
 export interface Game {
+
   id: string;
+
   date: string;
+
   time: string;
+
   field: string;
+
   team: string;
+
   opponent: string;
+
   status: string;
+
 }
+
+
+
+
 
 interface GamesContextData {
+
   games: Game[];
-  addGame: (game: Game) => void;
-  updateGame: (id: string, game: Game) => void;
-  removeGame: (id: string) => void;
+
+  addGame: (game: Game) => Promise<void>;
+
+  updateGame: (
+    id: string,
+    game: Game
+  ) => Promise<void>;
+
+  removeGame: (
+    id: string
+  ) => Promise<void>;
+
 }
 
-const GamesContext = createContext<GamesContextData | null>(null);
+
+
+
+
+const GamesContext =
+  createContext<GamesContextData | null>(null);
+
+
+
+
+
+
 
 export function GamesProvider({
+
   children,
+
 }: {
+
   children: ReactNode;
+
 }) {
-  const [games, setGames] = useState<Game[]>([]);
 
-  function addGame(game: Game) {
-    setGames((current) => [...current, game]);
+
+
+  const [games, setGames] =
+    useState<Game[]>([]);
+
+
+
+  const [loading, setLoading] =
+    useState(true);
+
+
+
+
+
+
+
+
+  // Buscar jogos do banco
+
+  async function loadGames() {
+
+
+    try {
+
+
+      const response =
+        await fetch("/api/games");
+
+
+      const data =
+        await response.json();
+
+
+      setGames(data);
+
+
+    } catch (error) {
+
+
+      console.error(
+        "Erro ao carregar jogos:",
+        error
+      );
+
+
+    } finally {
+
+
+      setLoading(false);
+
+
+    }
+
+
   }
 
-  function updateGame(id: string, updatedGame: Game) {
-    setGames((current) =>
-      current.map((game) =>
-        game.id === id ? updatedGame : game
-      )
-    );
+
+
+
+
+
+
+
+  useEffect(() => {
+
+
+    loadGames();
+
+
+  }, []);
+
+
+
+
+
+
+
+
+
+  // Criar jogo
+
+  async function addGame(game: Game) {
+
+
+    const response =
+      await fetch("/api/games", {
+
+        method: "POST",
+
+        headers: {
+
+          "Content-Type":
+            "application/json",
+
+        },
+
+        body: JSON.stringify(game),
+
+      });
+
+
+
+    const newGame =
+      await response.json();
+
+
+
+    setGames((current) => [
+
+      ...current,
+
+      newGame,
+
+    ]);
+
+
   }
 
-  function removeGame(id: string) {
-    setGames((current) =>
-      current.filter((game) => game.id !== id)
-    );
-  }
 
-  return (
-    <GamesContext.Provider
-      value={{
-        games,
-        addGame,
-        updateGame,
-        removeGame,
-      }}
-    >
-      {children}
-    </GamesContext.Provider>
+
+
+
+
+
+
+
+  // Atualizar jogo
+
+  async function updateGame(
+
+    id: string,
+
+    updatedGame: Game
+
+  ) {
+
+
+
+    async function updateGame(
+
+  id: string,
+
+  updatedGame: Game
+
+) {
+
+
+  const response = await fetch("/api/games", {
+
+    method: "PUT",
+
+    headers: {
+
+      "Content-Type": "application/json",
+
+    },
+
+    body: JSON.stringify({
+
+      ...updatedGame,
+
+      id,
+
+    }),
+
+  });
+
+
+
+  const game = await response.json();
+
+
+
+  setGames((current) =>
+
+    current.map((item) =>
+
+      item.id === id
+
+        ? game
+
+        : item
+
+    )
+
   );
+
+
 }
 
-export function useGames() {
-  const context = useContext(GamesContext);
 
-  if (!context) {
-    throw new Error(
-      "useGames deve ser usado dentro de GamesProvider."
-    );
   }
 
+
+
+
+
+
+
+
+
+  // Remover jogo
+
+  async function removeGame(
+
+    id: string
+
+  ) {
+
+
+    await fetch("/api/games", {
+
+
+      method: "DELETE",
+
+
+      headers: {
+
+
+        "Content-Type":
+          "application/json",
+
+
+      },
+
+
+      body: JSON.stringify({
+
+        id,
+
+      }),
+
+
+    });
+
+
+
+
+    setGames((current) =>
+
+      current.filter(
+
+        (game) =>
+
+          game.id !== id
+
+      )
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+
+
+  return (
+
+    <GamesContext.Provider
+
+      value={{
+
+        games,
+
+        addGame,
+
+        updateGame,
+
+        removeGame,
+
+      }}
+
+    >
+
+      {children}
+
+
+    </GamesContext.Provider>
+
+
+  );
+
+}
+
+
+
+
+
+
+
+
+
+export function useGames() {
+
+
+  const context =
+    useContext(GamesContext);
+
+
+
+  if (!context) {
+
+
+    throw new Error(
+
+      "useGames deve ser usado dentro de GamesProvider."
+
+    );
+
+
+  }
+
+
+
   return context;
+
+
 }

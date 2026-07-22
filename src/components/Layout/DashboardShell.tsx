@@ -1,7 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 import { AppSidebar } from "./sidebar/AppSidebar";
-import { Header } from "./header/Header";
 
 
 export function DashboardShell({
@@ -9,6 +8,7 @@ export function DashboardShell({
 }: {
   children: React.ReactNode;
 }) {
+
 
   return (
 
@@ -28,26 +28,30 @@ export function DashboardShell({
       >
 
 
+
         <AppSidebar />
 
 
 
+
+
         <main
+
           className="
           flex-1
           overflow-hidden
           "
+
         >
-
-
-          <Header />
 
 
 
           <div
+
             className="
             p-6
             "
+
           >
 
             {children}
@@ -61,7 +65,9 @@ export function DashboardShell({
 
 
 
+
       </div>
+
 
 
     </SidebarProvider>

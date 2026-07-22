@@ -1,6 +1,6 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 
 function Card({
@@ -54,7 +54,7 @@ function Card({
 
     />
 
-  )
+  );
 }
 
 
@@ -83,6 +83,7 @@ function CardHeader({
         items-start
         gap-2
         px-(--card-spacing)
+        font-sans
         text-white
         `,
 
@@ -94,8 +95,10 @@ function CardHeader({
 
     />
 
-  )
+  );
 }
+
+
 
 
 
@@ -117,9 +120,11 @@ function CardTitle({
       className={cn(
 
         `
-        font-bold
+        font-sans
+        font-semibold
         text-white
         leading-snug
+        tracking-tight
         `,
 
         className
@@ -130,8 +135,10 @@ function CardTitle({
 
     />
 
-  )
+  );
 }
+
+
 
 
 
@@ -153,7 +160,13 @@ function CardDescription({
 
       className={cn(
 
-        "text-sm text-slate-400",
+        `
+        font-sans
+        text-sm
+        font-light
+        text-slate-300
+        tracking-tight
+        `,
 
         className
 
@@ -163,8 +176,11 @@ function CardDescription({
 
     />
 
-  )
+  );
 }
+
+
+
 
 
 
@@ -201,8 +217,10 @@ function CardAction({
 
     />
 
-  )
+  );
 }
+
+
 
 
 
@@ -226,7 +244,9 @@ function CardContent({
 
         `
         px-(--card-spacing)
+        font-sans
         text-slate-300
+        tracking-tight
         `,
 
         className
@@ -237,8 +257,10 @@ function CardContent({
 
     />
 
-  )
+  );
 }
+
+
 
 
 
@@ -268,6 +290,7 @@ function CardFooter({
         border-white/10
         bg-black/20
         p-(--card-spacing)
+        font-sans
         `,
 
         className
@@ -278,8 +301,10 @@ function CardFooter({
 
     />
 
-  )
+  );
 }
+
+
 
 
 
@@ -293,4 +318,4 @@ export {
   CardAction,
   CardDescription,
   CardContent,
-}
+};

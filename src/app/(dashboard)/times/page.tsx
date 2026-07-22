@@ -1,8 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
-
 import {
   Card,
   CardContent,
@@ -10,36 +7,44 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 import { Badge } from "@/components/ui/badge";
-
 
 import { NewTeamDialog } from "@/components/times/NewTeamDialog";
 
-
 import { TeamActions } from "@/components/times/TeamActions";
+
+import { useTeams } from "@/context/TeamsContext";
+
 
 
 
 export default function TimesPage() {
 
 
-  const [teams, setTeams] = useState([
-    "Feras FC",
-    "Lobos FC",
-  ]);
+  const {
+    teams,
+    addTeam,
+    updateTeam,
+    removeTeam,
+  } = useTeams();
 
 
 
 
 
-  function handleCreateTeam(name: string) {
+
+
+  async function handleCreateTeam(
+    name: string
+  ) {
 
 
     const exists = teams.some(
 
       (team) =>
-        team.toLowerCase() === name.toLowerCase()
+
+        team.name.toLowerCase() ===
+        name.toLowerCase()
 
     );
 
@@ -53,17 +58,8 @@ export default function TimesPage() {
 
 
 
-    setTeams((current) => [
+    return await addTeam(name);
 
-      ...current,
-
-      name,
-
-    ]);
-
-
-
-    return true;
 
   }
 
@@ -72,23 +68,25 @@ export default function TimesPage() {
 
 
 
-  function handleEditTeam(
-    oldName: string,
+
+
+  async function handleEditTeam(
+
+    id: string,
+
     newName: string
+
   ) {
 
 
-    setTeams((current) =>
+    await updateTeam(
 
-      current.map((team) =>
+      id,
 
-        team === oldName
-          ? newName
-          : team
-
-      )
+      newName
 
     );
+
 
   }
 
@@ -98,20 +96,22 @@ export default function TimesPage() {
 
 
 
-  function handleDeleteTeam(name: string) {
 
 
-    setTeams((current) =>
+  async function handleDeleteTeam(
 
-      current.filter(
+    id: string
 
-        (team) => team !== name
+  ) {
 
-      )
 
-    );
+    await removeTeam(id);
+
 
   }
+
+
+
 
 
 
@@ -120,28 +120,46 @@ export default function TimesPage() {
 
   return (
 
+
     <div className="space-y-6">
+
+
+
 
 
 
       <div className="flex items-center justify-between">
 
 
+
+
+
         <div>
 
 
           <h1 className="text-3xl font-bold">
+
             Times cadastrados ⚽
+
           </h1>
 
 
 
+
+
           <p className="text-muted-foreground">
+
             {teams.length} times ativos
+
           </p>
 
 
+
         </div>
+
+
+
+
 
 
 
@@ -152,7 +170,12 @@ export default function TimesPage() {
         />
 
 
+
+
+
       </div>
+
+
 
 
 
@@ -164,22 +187,40 @@ export default function TimesPage() {
 
 
 
+
+
+
         {teams.map((team) => (
 
 
 
-          <Card key={team}>
+
+          <Card
+
+            key={team.id}
+
+          >
+
+
+
 
 
             <CardHeader>
 
 
+
               <CardTitle>
-                {team}
+
+                {team.name}
+
               </CardTitle>
 
 
+
             </CardHeader>
+
+
+
 
 
 
@@ -189,16 +230,28 @@ export default function TimesPage() {
 
 
 
+
+
               <p className="text-muted-foreground">
+
                 Time cadastrado
+
               </p>
 
 
 
 
+
+
               <Badge className="mt-3">
+
                 Ativo
+
               </Badge>
+
+
+
+
 
 
 
@@ -206,13 +259,25 @@ export default function TimesPage() {
 
               <TeamActions
 
+
+
                 team={team}
+
+
 
                 onEdit={handleEditTeam}
 
+
+
                 onDelete={handleDeleteTeam}
 
+
+
               />
+
+
+
+
 
 
 
@@ -220,7 +285,14 @@ export default function TimesPage() {
 
 
 
+
+
+
+
           </Card>
+
+
+
 
 
 
@@ -228,12 +300,21 @@ export default function TimesPage() {
 
 
 
+
+
+
+
       </div>
+
+
+
 
 
 
     </div>
 
+
   );
+
 
 }

@@ -15,46 +15,84 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 
+
 interface NewTeamDialogProps {
-  onCreate: (name: string) => boolean;
+
+  onCreate: (
+    name: string
+  ) => Promise<boolean>;
+
 }
 
 
+
+
 export function NewTeamDialog({
+
   onCreate,
+
 }: NewTeamDialogProps) {
+
 
 
   const [name, setName] = useState("");
 
   const [error, setError] = useState("");
 
+  const [open, setOpen] = useState(false);
 
 
-  function handleSave() {
+
+
+
+
+
+  async function handleSave() {
+
 
 
     if (!name.trim()) {
 
-      setError("Digite o nome do time.");
+
+      setError(
+        "Digite o nome do time."
+      );
+
 
       return;
+
 
     }
 
 
 
-    const created = onCreate(name);
+
+
+
+    const created = await onCreate(
+      name.trim()
+    );
+
+
 
 
 
     if (!created) {
 
-      setError("Este time já está cadastrado.");
+
+      setError(
+        "Este time já está cadastrado."
+      );
+
 
       return;
 
+
     }
+
+
+
+
 
 
 
@@ -62,85 +100,174 @@ export function NewTeamDialog({
 
     setError("");
 
+    setOpen(false);
+
+
   }
+
+
+
+
+
 
 
 
   return (
 
-    <Dialog>
+
+    <Dialog
+
+      open={open}
+
+      onOpenChange={setOpen}
+
+    >
 
 
-      <DialogTrigger>
-        + Novo time
-      </DialogTrigger>
+
+     <DialogTrigger>
+
+  <Button>
+
+    + Novo time
+
+  </Button>
+
+</DialogTrigger>
+
+
+
+
 
 
 
       <DialogContent>
 
 
+
+
+
         <DialogHeader>
 
+
           <DialogTitle>
+
             Novo time ⚽
+
           </DialogTitle>
 
+
         </DialogHeader>
+
+
+
+
+
 
 
 
         <div className="space-y-4">
 
 
+
+
+
           <Input
+
+
 
             placeholder="Nome do time"
 
+
+
             value={name}
+
+
 
             onChange={(e) => {
 
-              setName(e.target.value);
+
+              setName(
+                e.target.value
+              );
+
 
               setError("");
 
             }}
 
+
           />
+
+
+
+
+
 
 
 
           {error && (
 
+
             <p className="text-sm text-red-500">
+
+
               ⚠ {error}
+
+
             </p>
+
 
           )}
 
 
 
+
+
+
+
+
           <Button
+
 
             onClick={handleSave}
 
+
             className="w-full"
+
 
           >
 
+
             Salvar time
 
+
           </Button>
+
+
+
+
+
 
 
         </div>
 
 
+
+
+
+
+
       </DialogContent>
+
+
+
 
 
     </Dialog>
 
+
   );
+
+
 }

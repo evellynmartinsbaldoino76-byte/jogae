@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import {
   CalendarDays,
   Clock3,
@@ -27,26 +25,7 @@ import { NewGameDialog } from "@/components/jogos/NewGameDialog";
 import { teams } from "@/lib/teams";
 
 
-
-
-
-interface Game {
-
-  id: string;
-
-  date: string;
-
-  time: string;
-
-  field: string;
-
-  team: string;
-
-  opponent: string;
-
-  status: string;
-
-}
+import { useGames } from "@/context/GamesContext";
 
 
 
@@ -55,30 +34,7 @@ interface Game {
 export default function JogosPage() {
 
 
-
-  const [games, setGames] = useState<Game[]>([]);
-
-
-
-
-
-
-  function handleCreateGame(game: Game) {
-
-
-    setGames((current) => [
-
-      ...current,
-
-      game,
-
-    ]);
-
-
-  }
-
-
-
+  const { games, addGame } = useGames();
 
 
 
@@ -87,10 +43,7 @@ export default function JogosPage() {
   return (
 
 
-
     <div className="space-y-8">
-
-
 
 
 
@@ -100,6 +53,7 @@ export default function JogosPage() {
 
 
       <div className="flex items-center justify-between">
+
 
 
         <div>
@@ -112,11 +66,13 @@ export default function JogosPage() {
           </h1>
 
 
+
           <p className="mt-2 text-slate-400">
 
-            Gerencie partidas, horários e adversários.
+            Organize os jogos, horários e adversários.
 
           </p>
+
 
 
         </div>
@@ -133,7 +89,7 @@ export default function JogosPage() {
 
           games={games}
 
-          onCreate={handleCreateGame}
+          onCreate={addGame}
 
         />
 
@@ -148,224 +104,147 @@ export default function JogosPage() {
 
 
 
+      {/* Lista de jogos */}
 
 
-      {games.length === 0 && (
+      <div
 
+        className="
+        grid
+        gap-6
+        md:grid-cols-2
+        xl:grid-cols-3
+        "
 
-        <Card>
-
-
-          <CardContent className="flex flex-col items-center justify-center py-12">
-
-
-            <Shield
-
-              size={50}
-
-              className="mb-4 text-emerald-400"
-
-            />
-
-
-            <p className="text-slate-300">
-
-              Nenhum jogo agendado ainda.
-
-            </p>
-
-
-            <p className="mt-2 text-sm text-slate-500">
-
-              Clique em "+ Novo jogo" para começar.
-
-            </p>
-
-
-          </CardContent>
-
-
-        </Card>
-
-
-      )}
+      >
 
 
 
 
-
-
-
-
-
-      <div className="grid gap-6 md:grid-cols-2">
-
-
-
-
-
-
-        {games.map((game) => (
-
+        {games.length === 0 ? (
 
 
           <Card
 
-            key={game.id}
-
-            className="overflow-hidden"
+            className="
+            border-white/10
+            bg-white/5
+            backdrop-blur-xl
+            "
 
           >
 
 
+            <CardContent
 
-            <CardHeader>
+              className="
+              p-6
+              text-center
+              text-slate-400
+              "
+
+            >
+
+              Nenhum jogo agendado.
+
+
+            </CardContent>
+
+
+          </Card>
 
 
 
-              <div className="flex items-center justify-between">
+        ) : (
 
 
-                <CardTitle className="text-xl">
+
+          games.map((game) => (
 
 
-                  Próxima partida
+
+            <Card
+
+              key={game.id}
+
+              className="
+              border-white/10
+              bg-white/5
+              backdrop-blur-xl
+              shadow-xl
+              "
+
+            >
+
+
+
+
+              <CardHeader>
+
+
+                <CardTitle
+
+                  className="
+                  flex
+                  items-center
+                  justify-between
+                  text-white
+                  "
+
+                >
+
+
+
+                  <span>
+
+                    {game.team} x {game.opponent}
+
+                  </span>
+
+
+
+                  <Badge
+
+                    className="
+                    bg-emerald-500/20
+                    text-emerald-400
+                    "
+
+                  >
+
+                    {game.status}
+
+                  </Badge>
+
 
 
                 </CardTitle>
 
 
+              </CardHeader>
 
 
-                <Badge
 
-                  className={
-                    game.status === "Confirmado"
 
-                    ?
 
-                    "bg-emerald-500 text-black"
 
-                    :
+              <CardContent
 
-                    "bg-yellow-400 text-black"
+                className="
+                space-y-3
+                text-slate-300
+                "
 
-                  }
-
-                >
-
-                  {game.status}
-
-
-                </Badge>
-
-
-
-              </div>
-
-
-
-            </CardHeader>
-
-
-
-
-
-
-
-
-
-            <CardContent className="space-y-6">
-
-
-
-
-
-              <div className="flex items-center justify-center gap-4 text-center">
-
-
-
-                <div>
-
-
-                  <p className="text-2xl font-bold text-white">
-
-                    {game.team}
-
-                  </p>
-
-
-                  <p className="text-xs text-slate-400">
-
-                    Mandante
-
-                  </p>
-
-
-                </div>
-
-
-
-
-
-                <span className="text-3xl font-bold text-emerald-400">
-
-                  X
-
-                </span>
-
-
-
-
-
-
-                <div>
-
-
-
-                  <p className="text-2xl font-bold text-white">
-
-
-                    {game.opponent || "Aguardando adversário"}
-
-
-                  </p>
-
-
-                  <p className="text-xs text-slate-400">
-
-                    Visitante
-
-                  </p>
-
-
-                </div>
-
-
-
-
-
-              </div>
-
-
-
-
-
-
-
-
-
-              <div className="space-y-3 border-t border-white/10 pt-5 text-slate-300">
-
-
+              >
 
 
 
                 <p className="flex items-center gap-2">
 
-                  <CalendarDays size={18} className="text-emerald-400"/>
+                  <CalendarDays size={18} />
 
                   {game.date}
+
 
                 </p>
 
@@ -376,7 +255,7 @@ export default function JogosPage() {
                 <p className="flex items-center gap-2">
 
 
-                  <Clock3 size={18} className="text-emerald-400"/>
+                  <Clock3 size={18} />
 
                   {game.time}
 
@@ -388,11 +267,10 @@ export default function JogosPage() {
 
 
 
-
                 <p className="flex items-center gap-2">
 
 
-                  <MapPin size={18} className="text-emerald-400"/>
+                  <MapPin size={18} />
 
                   {game.field}
 
@@ -403,23 +281,33 @@ export default function JogosPage() {
 
 
 
-
-              </div>
-
+                <p className="flex items-center gap-2">
 
 
+                  <Shield size={18} />
+
+                  {game.team}
 
 
-            </CardContent>
-
-
-
-          </Card>
+                </p>
 
 
 
 
-        ))}
+              </CardContent>
+
+
+
+
+
+            </Card>
+
+
+
+          ))
+
+
+        )}
 
 
 

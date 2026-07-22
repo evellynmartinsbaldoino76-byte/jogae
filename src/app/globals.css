@@ -134,13 +134,51 @@
 }
 
 @layer base {
+
   * {
     @apply border-border outline-ring/50;
   }
+
+
   body {
+
     @apply bg-background text-foreground;
+
+    font-family: var(--font-sans), sans-serif;
+
+    letter-spacing: -0.01em;
+
   }
+
+
   html {
-    @apply font-sans;
+
+    font-family: var(--font-sans), sans-serif;
+
   }
+
+
+  h1,
+  h2,
+  h3,
+  h4 {
+
+    font-family: var(--font-sans), sans-serif;
+
+    letter-spacing: -0.03em;
+
+    font-weight: 700;
+
+  }
+
+
+  p,
+  span,
+  button,
+  input {
+
+    font-family: var(--font-sans), sans-serif;
+
+  }
+
 }

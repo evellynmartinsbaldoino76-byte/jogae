@@ -15,96 +15,234 @@ import {
 import { Input } from "@/components/ui/input";
 
 
+
 interface TeamActionsProps {
-  team: string;
-  onEdit: (oldName: string, newName: string) => void;
-  onDelete: (name: string) => void;
+
+
+  team: {
+
+    id: string;
+
+    name: string;
+
+  };
+
+
+  onEdit: (
+
+    id: string,
+
+    newName: string
+
+  ) => Promise<void>;
+
+
+
+  onDelete: (
+
+    id: string
+
+  ) => Promise<void>;
+
+
 }
 
 
+
+
+
+
+
 export function TeamActions({
+
   team,
+
   onEdit,
+
   onDelete,
+
 }: TeamActionsProps) {
 
 
-  const [name, setName] = useState(team);
+
+  const [name, setName] = useState(team.name);
 
 
 
-  function handleEdit() {
+  const [open, setOpen] = useState(false);
+
+
+
+
+
+
+
+
+  async function handleEdit() {
+
+
 
     if (!name.trim()) return;
 
 
-    onEdit(team, name);
+
+    await onEdit(
+
+      team.id,
+
+      name.trim()
+
+    );
+
+
+
+    setOpen(false);
+
 
   }
 
 
 
+
+
+
+
+
   return (
+
 
     <div className="flex gap-2 mt-4">
 
 
-      <Dialog>
+
+
+
+
+      <Dialog
+
+        open={open}
+
+        onOpenChange={setOpen}
+
+      >
+
+
+
 
 
         <DialogTrigger>
+
+
           <Button variant="outline">
+
             Editar
+
           </Button>
+
+
         </DialogTrigger>
+
+
+
+
+
 
 
 
         <DialogContent>
 
 
+
+
+
           <DialogHeader>
 
+
             <DialogTitle>
+
               Editar time ⚽
+
             </DialogTitle>
 
+
           </DialogHeader>
+
+
+
+
+
 
 
 
           <div className="space-y-4">
 
 
+
+
+
             <Input
+
+
 
               value={name}
 
+
+
               onChange={(e) =>
+
                 setName(e.target.value)
+
               }
+
 
             />
 
 
 
+
+
+
+
             <Button
+
+
 
               onClick={handleEdit}
 
+
+
               className="w-full"
+
 
             >
 
+
               Salvar alteração
 
+
             </Button>
+
+
+
+
+
 
 
           </div>
 
 
+
+
+
+
+
+
         </DialogContent>
+
+
+
+
+
 
 
       </Dialog>
@@ -113,22 +251,43 @@ export function TeamActions({
 
 
 
+
+
+
+
       <Button
+
+
 
         variant="destructive"
 
-        onClick={() => onDelete(team)}
+
+
+        onClick={() =>
+
+          onDelete(team.id)
+
+        }
+
 
       >
 
+
         Excluir
+
 
       </Button>
 
 
 
+
+
+
     </div>
 
+
+
   );
+
 
 }

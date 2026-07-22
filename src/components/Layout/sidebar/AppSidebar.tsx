@@ -7,6 +7,8 @@ import {
   Clock3,
 } from "lucide-react";
 
+import { usePathname } from "next/navigation";
+
 
 import {
   Sidebar,
@@ -18,6 +20,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
 
 
 
@@ -54,7 +57,14 @@ const items = [
 
 
 
+
+
+
 export function AppSidebar() {
+
+
+  const pathname = usePathname();
+
 
 
   return (
@@ -64,10 +74,8 @@ export function AppSidebar() {
       className="
       border-r
       border-white/10
-      bg-gradient-to-b
-      from-[#061a16]
-      via-[#071525]
-      to-[#05070d]
+      bg-[#050b12]/80
+      backdrop-blur-xl
       "
 
     >
@@ -88,28 +96,45 @@ export function AppSidebar() {
 
 
 
-
           <SidebarGroupLabel
 
             className="
+            flex
+            items-center
             px-5
-            py-6
+            py-8
             text-xl
             font-bold
+            tracking-tight
             text-white
             "
 
           >
 
 
-            <span className="text-emerald-400">
+            <span
+
+              className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              bg-emerald-400/10
+              text-xl
+              ring-1
+              ring-emerald-400/20
+              "
+
+            >
 
               ⚽
 
             </span>
 
 
-            <span className="ml-2">
+            <span className="ml-3">
 
               Jogaê
 
@@ -130,79 +155,155 @@ export function AppSidebar() {
             <SidebarMenu>
 
 
+              {items.map((item) => {
 
-              {items.map((item) => (
 
-
-                <SidebarMenuItem
-
-                  key={item.title}
-
-                >
+                const active = pathname === item.url;
 
 
 
+                return (
 
-                  <SidebarMenuButton
+                  <SidebarMenuItem
 
-                    className="
-                    mx-3
-                    rounded-xl
-                    text-slate-300
-                    transition-all
-                    hover:bg-emerald-400/10
-                    hover:text-emerald-400
-                    "
+                    key={item.title}
 
                   >
 
 
 
-                    <a
+                    <SidebarMenuButton
 
-                      href={item.url}
+                      className={`
 
-                      className="
-                      flex
-                      w-full
-                      items-center
-                      gap-3
-                      "
+                      group
+
+                      relative
+
+                      mx-3
+
+                      mb-2
+
+                      h-11
+
+                      rounded-xl
+
+                      transition-all
+
+                      ${
+                        active
+
+                        ?
+
+                        "bg-emerald-400/15 text-emerald-300 shadow-lg shadow-emerald-500/10"
+
+                        :
+
+                        "text-slate-300 hover:bg-white/5 hover:text-white"
+
+                      }
+
+                      `}
 
                     >
 
 
 
-                      <item.icon
 
-                        size={20}
+                      <a
 
-                      />
+                        href={item.url}
 
+                        className="
+                        flex
+                        w-full
+                        items-center
+                        gap-3
+                        "
 
-
-                      <span>
-
-                        {item.title}
-
-                      </span>
-
-
-
-                    </a>
+                      >
 
 
 
 
-                  </SidebarMenuButton>
+                        {active && (
+
+                          <span
+
+                            className="
+                            absolute
+                            left-0
+                            h-8
+                            w-1
+                            rounded-full
+                            bg-emerald-400
+                            "
+
+                          />
+
+                        )}
 
 
 
-                </SidebarMenuItem>
 
 
 
-              ))}
+                        <item.icon
+
+                          size={20}
+
+                          className={
+
+                            active
+
+                            ?
+
+                            "text-emerald-400"
+
+                            :
+
+                            "text-slate-400 group-hover:text-emerald-300"
+
+                          }
+
+                        />
+
+
+
+
+                        <span
+
+                          className="
+                          font-medium
+                          "
+
+                        >
+
+                          {item.title}
+
+
+                        </span>
+
+
+
+
+                      </a>
+
+
+
+                    </SidebarMenuButton>
+
+
+
+
+                  </SidebarMenuItem>
+
+
+                );
+
+
+              })}
+
 
 
 
@@ -217,12 +318,14 @@ export function AppSidebar() {
 
 
 
+
         </SidebarGroup>
 
 
 
 
       </SidebarContent>
+
 
 
 

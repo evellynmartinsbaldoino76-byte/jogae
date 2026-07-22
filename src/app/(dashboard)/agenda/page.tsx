@@ -3,93 +3,89 @@
 import { useState } from "react";
 
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 
-import { Input } from "@/components/ui/input";
+import { ScheduleCard } from "@/components/agenda/ScheduleCard";
+
+import { NewGameDialog } from "@/components/jogos/NewGameDialog";
+
+import { DeleteGameDialog } from "@/components/jogos/DeleteGameDialog";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  useGames,
+  Game,
+} from "@/context/GamesContext";
 
-import { Button } from "@/components/ui/button";
-
-import { useGames } from "@/context/GamesContext";
+import { teams } from "@/lib/teams";
 
 
-
-const horariosIniciais = [
-  "19:30",
-  "20:30",
-  "21:30",
-];
 
 
 
 export default function AgendaPage() {
 
 
-  const { games } = useGames();
+  const [selectedDate, setSelectedDate] = useState(
+    new Date()
+  );
 
 
-  const hoje = new Date()
-    .toISOString()
-    .split("T")[0];
+  const [dialogOpen, setDialogOpen] = useState(false);
 
 
-
-  const [data, setData] = useState(hoje);
-
-
-  const [horarios, setHorarios] =
-    useState(horariosIniciais);
+  const [selectedTime, setSelectedTime] = useState("");
 
 
+  const [editingGame, setEditingGame] = useState<Game | null>(null);
 
-  const [novoHorario, setNovoHorario] =
-    useState("");
+
+  const [deletingGame, setDeletingGame] = useState<Game | null>(null);
 
 
 
-  const [open, setOpen] =
-    useState(false);
+  const {
+    games,
+    addGame,
+    updateGame,
+    removeGame,
+  } = useGames();
+
+
+
+
+
+  const horarios = [
+
+    "19:30",
+
+    "20:30",
+
+    "21:30",
+
+  ];
 
 
 
 
 
 
-  function adicionarHorario() {
+
+  function changeDay(value: number) {
 
 
-    if (!novoHorario) {
-      return;
-    }
+    const newDate = new Date(selectedDate);
 
 
-
-    setHorarios((atual) => [
-
-      ...atual,
-
-      novoHorario,
-
-    ]);
+    newDate.setDate(
+      newDate.getDate() + value
+    );
 
 
+    setSelectedDate(newDate);
 
-    setNovoHorario("");
-
-    setOpen(false);
 
   }
 
@@ -99,17 +95,82 @@ export default function AgendaPage() {
 
 
 
+  function getWeekDay(date: Date) {
 
-  function encontrarJogo(horario: string) {
+
+    return new Intl.DateTimeFormat(
+
+      "pt-BR",
+
+      {
+        weekday: "long",
+      }
+
+    )
+
+      .format(date)
+
+      .toUpperCase();
 
 
-    return games.find(
+  }
 
-      (game) =>
 
-        game.date === data &&
 
-        game.time === horario
+
+
+
+
+  function getFullDate(date: Date) {
+
+
+    return new Intl.DateTimeFormat(
+
+      "pt-BR",
+
+      {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }
+
+    )
+
+      .format(date)
+
+      .toUpperCase();
+
+
+  }
+
+
+
+
+
+
+
+  function formatDate(date: Date) {
+
+
+    return (
+
+      date.getFullYear()
+
+      +
+
+      "-" +
+
+      String(
+        date.getMonth() + 1
+      ).padStart(2, "0")
+
+      +
+
+      "-" +
+
+      String(
+        date.getDate()
+      ).padStart(2, "0")
 
     );
 
@@ -123,32 +184,84 @@ export default function AgendaPage() {
 
 
 
+  function getGameByTime(time: string) {
+
+
+    return games.find(
+
+      (game) =>
+
+        game.date === formatDate(selectedDate)
+
+        &&
+
+        game.time === time
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+  function handleSchedule(time: string) {
+
+
+    setEditingGame(null);
+
+    setSelectedTime(time);
+
+    setDialogOpen(true);
+
+
+  }
+
+
+
+
+
+
+
+  function handleEdit(game: Game) {
+
+
+    setEditingGame(game);
+
+    setSelectedTime(game.time);
+
+    setDialogOpen(true);
+
+
+  }
+
+
+
+
+
+
+
+  function handleDelete(game: Game) {
+
+
+    setDeletingGame(game);
+
+
+  }
+
+
+
+
+
+
+
   return (
 
-    <div className="space-y-6">
 
-
-
-
-
-      <div className="flex items-center justify-between">
-
-
-        <div>
-
-
-          <h1 className="text-3xl font-bold">
-            Agenda 🕒
-          </h1>
-
-
-
-          <p className="text-muted-foreground">
-            Controle de datas e horários disponíveis para jogos.
-          </p>
-
-
-        </div>
+    <div className="space-y-8">
 
 
 
@@ -156,104 +269,112 @@ export default function AgendaPage() {
 
 
 
-        <Dialog
-          open={open}
-          onOpenChange={setOpen}
+      <div
+
+        className="
+        flex
+        items-center
+        justify-between
+        "
+
+      >
+
+
+
+
+
+        <div
+
+          className="
+          flex
+          items-center
+          gap-4
+          "
+
         >
 
 
 
-          <DialogTrigger
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          <button
+
+            onClick={() => changeDay(-1)}
+
+            className="
+            rounded-xl
+            border
+            border-white/10
+            bg-white/5
+            p-3
+            text-white
+            transition
+            hover:bg-white/10
+            "
+
           >
 
-            + Novo horário
-
-          </DialogTrigger>
+            <ChevronLeft size={22}/>
 
 
-
-
-
-
-
-
-          <DialogContent>
-
-
-
-            <DialogHeader>
-
-
-              <DialogTitle>
-                Adicionar horário
-              </DialogTitle>
-
-
-            </DialogHeader>
+          </button>
 
 
 
 
 
 
-
-            <div className="space-y-4">
-
+          <div className="text-center">
 
 
+            <p className="text-sm font-semibold text-emerald-400">
 
+              {getWeekDay(selectedDate)}
 
-              <Input
-
-                type="time"
-
-                value={novoHorario}
-
-                onChange={(e) =>
-                  setNovoHorario(e.target.value)
-                }
-
-              />
+            </p>
 
 
 
+            <p className="text-2xl font-bold text-white">
+
+              {getFullDate(selectedDate)}
+
+            </p>
 
 
 
-
-              <Button
-
-                className="w-full"
-
-                onClick={adicionarHorario}
-
-              >
-
-                Salvar horário
-
-              </Button>
-
-
-
-
-
-            </div>
-
-
-
-
-
-          </DialogContent>
+          </div>
 
 
 
 
 
 
-        </Dialog>
+          <button
+
+            onClick={() => changeDay(1)
+
+            }
+
+            className="
+            rounded-xl
+            border
+            border-white/10
+            bg-white/5
+            p-3
+            text-white
+            transition
+            hover:bg-white/10
+            "
+
+          >
+
+            <ChevronRight size={22}/>
 
 
+          </button>
+
+
+
+        </div>
 
 
 
@@ -267,204 +388,91 @@ export default function AgendaPage() {
 
 
 
-      <Card>
+      <div
 
+        className="
+        grid
+        gap-5
+        md:grid-cols-3
+        "
 
-        <CardHeader>
-
-
-          <CardTitle>
-            📅 Data da agenda
-          </CardTitle>
-
-
-        </CardHeader>
+      >
 
 
 
 
+        {
 
-        <CardContent>
-
-
-          <Input
-
-            type="date"
-
-            value={data}
-
-            onChange={(e) =>
-              setData(e.target.value)
-            }
-
-          />
+          horarios.map((horario) => {
 
 
-        </CardContent>
-
-
-      </Card>
-
-
-
-
-
-
-
-
-
-      <Card>
-
-
-        <CardHeader>
-
-
-          <CardTitle>
-            Campo principal 🏟️
-          </CardTitle>
-
-
-        </CardHeader>
-
-
-
-
-
-
-        <CardContent className="space-y-3">
-
-
-
-
-
-
-          {horarios.map((horario) => {
-
-
-            const jogo = encontrarJogo(horario);
+            const game = getGameByTime(horario);
 
 
 
 
             return (
 
-
-
-              <div
+              <ScheduleCard
 
                 key={horario}
 
-                className="flex items-center justify-between rounded-lg border p-4"
+                time={horario}
 
-              >
+                status={
 
+                  game
 
+                    ? "Agendado"
 
+                    : "Livre"
 
+                }
 
-                <div>
+                teams={
 
+                  game
 
+                    ? `${game.team} x ${game.opponent}`
 
-                  <p className="font-semibold">
+                    : undefined
 
-                    {horario}
+                }
 
-                  </p>
+                onSchedule={() =>
 
-
-
-
-
-
-                  {
-
-                    jogo ? (
-
-
-                      <p className="text-sm text-muted-foreground">
-
-
-                        ⚽ {jogo.team}
-
-                        {" x "}
-
-                        {jogo.opponent ||
-                          "Aguardando adversário"}
-
-
-                      </p>
-
-
-                    ) : (
-
-
-                      <p className="text-sm text-muted-foreground">
-
-                        Horário disponível
-
-                      </p>
-
-
-                    )
-
-
-                  }
-
-
-
-
-
-                </div>
-
-
-
-
-
-
-
-
-                {
-
-
-                  jogo ? (
-
-
-                    <Badge>
-
-                      {jogo.status}
-
-                    </Badge>
-
-
-                  ) : (
-
-
-                    <Badge>
-
-                      Disponível
-
-                    </Badge>
-
-
-                  )
-
+                  handleSchedule(horario)
 
                 }
 
 
+                onEdit={() =>
+
+                  game && handleEdit(game)
+
+                }
 
 
+                onDelete={() =>
 
-              </div>
+                  game && handleDelete(game)
+
+                }
 
 
+              />
 
 
             );
 
 
-          })}
+          })
+
+        }
+
+
+
+      </div>
 
 
 
@@ -472,11 +480,205 @@ export default function AgendaPage() {
 
 
 
-        </CardContent>
+
+
+      <div>
+
+
+        <h2
+
+          className="
+          mb-4
+          text-xl
+          font-semibold
+          text-white
+          "
+
+        >
+
+          Horário personalizado
+
+
+        </h2>
 
 
 
-      </Card>
+
+        <div
+
+          className="
+          rounded-2xl
+          border
+          border-white/10
+          bg-white/5
+          p-6
+          text-slate-300
+          backdrop-blur-xl
+          "
+
+        >
+
+          Nenhuma reserva personalizada.
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+      <NewGameDialog
+
+        teams={teams}
+
+        games={games}
+
+        open={dialogOpen}
+
+        onOpenChange={(open) => {
+
+
+          setDialogOpen(open);
+
+
+
+          if (!open) {
+
+
+            setEditingGame(null);
+
+
+          }
+
+
+        }}
+
+
+        showTrigger={false}
+
+
+        initialDate={
+
+          editingGame
+
+            ? editingGame.date
+
+            : formatDate(selectedDate)
+
+        }
+
+
+        initialTime={
+
+          editingGame
+
+            ? editingGame.time
+
+            : selectedTime
+
+        }
+
+
+        editingGame={editingGame}
+
+
+        onCreate={(game) => {
+
+
+          if (editingGame) {
+
+
+            updateGame(
+
+              editingGame.id,
+
+              game
+
+            );
+
+
+          } else {
+
+
+            addGame(game);
+
+
+          }
+
+
+        }}
+
+
+      />
+
+
+
+
+
+
+
+
+      <DeleteGameDialog
+
+        open={!!deletingGame}
+
+        onOpenChange={(open) => {
+
+
+          if (!open) {
+
+
+            setDeletingGame(null);
+
+
+          }
+
+
+        }}
+
+        teams={
+
+          deletingGame
+
+            ? `${deletingGame.team} x ${deletingGame.opponent}`
+
+            : ""
+
+        }
+
+
+        onConfirm={() => {
+
+
+          if (deletingGame) {
+
+
+            removeGame(
+
+              deletingGame.id
+
+            );
+
+
+            setDeletingGame(null);
+
+
+          }
+
+
+        }}
+
+
+      />
+
 
 
 
@@ -484,6 +686,7 @@ export default function AgendaPage() {
 
 
     </div>
+
 
   );
 
