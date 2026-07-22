@@ -10,9 +10,6 @@ import {
 
 import { useRouter } from "next/navigation";
 
-import { useEffect, useState } from "react";
-
-
 import {
   Card,
   CardContent,
@@ -20,33 +17,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 import { Badge } from "@/components/ui/badge";
-
 
 import { Button } from "@/components/ui/button";
 
-
-
-
-interface Game {
-
-  id: string;
-
-  date: string;
-
-  time: string;
-
-  field: string;
-
-  team: string;
-
-  opponent: string;
-
-  status: string;
-
-}
-
+import { useGames } from "@/context/GamesContext";
+import { useTeams } from "@/context/TeamsContext";
 
 
 
@@ -55,95 +31,23 @@ interface Game {
 export default function DashboardPage() {
 
 
-
   const router = useRouter();
 
 
-
-
-  const [games, setGames] =
-    useState<Game[]>([]);
-
-
-
-  const [teamsCount, setTeamsCount] =
-    useState(0);
+  const {
+    games,
+  } = useGames();
 
 
 
+  const {
+    teams,
+  } = useTeams();
 
 
 
-  useEffect(() => {
-
-
-
-    async function loadData() {
-
-
-
-      try {
-
-
-
-        const gamesResponse =
-          await fetch("/api/games");
-
-
-        const gamesData =
-          await gamesResponse.json();
-
-
-
-        setGames(gamesData);
-
-
-
-
-
-
-
-        const teamsResponse =
-          await fetch("/api/teams");
-
-
-
-        const teamsData =
-          await teamsResponse.json();
-
-
-
-        setTeamsCount(
-          teamsData.length
-        );
-
-
-
-
-      } catch (error) {
-
-
-        console.error(
-          "Erro ao carregar dashboard:",
-          error
-        );
-
-
-      }
-
-
-    }
-
-
-
-
-    loadData();
-
-
-
-  }, []);
-
-
+  const teamsCount =
+    teams.length;
 
 
 
@@ -159,13 +63,9 @@ export default function DashboardPage() {
 
 
 
-
-
   function novoJogo() {
 
-
     router.push("/jogos");
-
 
   }
 
@@ -175,10 +75,7 @@ export default function DashboardPage() {
 
 
 
-
-
   return (
-
 
 
     <main className="
@@ -191,23 +88,17 @@ export default function DashboardPage() {
     ">
 
 
-
       <div className="space-y-8">
 
 
 
-
-
-
         <div>
-
 
           <h1 className="text-4xl font-bold text-white">
 
             Olá, Gian 👋
 
           </h1>
-
 
 
           <p className="mt-2 text-slate-300">
@@ -218,9 +109,6 @@ export default function DashboardPage() {
 
 
         </div>
-
-
-
 
 
 
@@ -241,9 +129,7 @@ export default function DashboardPage() {
           ">
 
 
-
             <CardHeader>
-
 
               <CalendarDays className="text-emerald-400"/>
 
@@ -279,7 +165,6 @@ export default function DashboardPage() {
             </CardContent>
 
 
-
           </Card>
 
 
@@ -298,7 +183,6 @@ export default function DashboardPage() {
           ">
 
 
-
             <CardHeader>
 
 
@@ -313,6 +197,7 @@ export default function DashboardPage() {
 
 
             </CardHeader>
+
 
 
 
@@ -373,6 +258,8 @@ export default function DashboardPage() {
 
 
 
+
+
             <CardContent>
 
 
@@ -393,16 +280,13 @@ export default function DashboardPage() {
             </CardContent>
 
 
-
           </Card>
 
 
 
 
 
-
         </div>
-
 
 
 
@@ -424,11 +308,9 @@ export default function DashboardPage() {
 
         >
 
-
           <Plus className="mr-2"/>
 
           Agendar novo jogo
-
 
 
         </Button>
@@ -482,6 +364,7 @@ export default function DashboardPage() {
 
 
 
+
             {nextGame ? (
 
 
@@ -503,11 +386,13 @@ export default function DashboardPage() {
                   {nextGame.team}
 
 
+
                   <span className="mx-4 text-emerald-400">
 
                     X
 
                   </span>
+
 
 
                   {nextGame.opponent}
@@ -591,7 +476,6 @@ export default function DashboardPage() {
 
 
         </Card>
-
 
 
 
