@@ -104,15 +104,21 @@ export default function JogosPage() {
 
 
 
-  const filteredGames =
+const filteredGames =
+  (
     selectedTeam === "todos"
       ? games
       : games.filter(
           (game) =>
             game.team === selectedTeam ||
             game.opponent === selectedTeam
-        );
+        )
+  ).sort((a, b) => {
+    const dateA = new Date(`${a.date}T${a.time}`);
+    const dateB = new Date(`${b.date}T${b.time}`);
 
+    return dateA.getTime() - dateB.getTime();
+  });
 
 
   return (
