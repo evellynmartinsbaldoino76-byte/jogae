@@ -53,14 +53,21 @@ export default function DashboardPage() {
 
 
 
-  const nextGame =
-  [...games]
-    .sort((a, b) => {
-      const dataA = new Date(`${a.date}T${a.time}`);
-      const dataB = new Date(`${b.date}T${b.time}`);
+  const sortedGames = [...games].sort((a, b) => {
+  const dataA = new Date(`${a.date}T${a.time}`);
+  const dataB = new Date(`${b.date}T${b.time}`);
 
-      return dataA.getTime() - dataB.getTime();
-    })[0] ?? null;
+  return dataA.getTime() - dataB.getTime();
+});
+
+
+const nextGames =
+  sortedGames.length > 0
+    ? sortedGames.filter(
+        (game) =>
+          game.date === sortedGames[0].date
+      )
+    : [];
 
     function formatDate(date: string) {
   return new Date(`${date}T00:00:00`).toLocaleDateString("pt-BR");
@@ -99,7 +106,7 @@ export default function DashboardPage() {
 
           <h1 className="text-4xl font-bold text-white">
 
-            Olá, Gian 👋
+            Olá!
 
           </h1>
 
@@ -139,7 +146,7 @@ export default function DashboardPage() {
 
               <CardTitle>
 
-                Próximo jogo
+                Jogos
 
               </CardTitle>
 
@@ -346,7 +353,7 @@ export default function DashboardPage() {
 
               <CardTitle>
 
-                Próxima Partida
+                Próximas Partidas
 
               </CardTitle>
 
@@ -368,108 +375,80 @@ export default function DashboardPage() {
 
 
 
-            {nextGame ? (
+            {nextGames.length > 0 ? (
 
+  <div className="space-y-4">
 
+    {nextGames.map((game) => (
 
-              <div className="
-                rounded-2xl
-                border
-                border-white/10
-                bg-black/20
-                p-8
-                text-center
-              ">
+      <div
+        key={game.id}
+        className="
+          rounded-2xl
+          border
+          border-white/10
+          bg-black/20
+          p-6
+          text-center
+        "
+      >
 
+        <h2 className="text-2xl font-bold text-white">
 
+          {game.team}
 
-                <h2 className="text-3xl font-bold">
+          <span className="mx-4 text-emerald-400">
+            X
+          </span>
 
+          {game.opponent}
 
-                  {nextGame.team}
+        </h2>
 
 
+        <div className="mt-4 space-y-2 text-slate-300">
 
-                  <span className="mx-4 text-emerald-400">
+          <p>
+            🕒 {formatDate(game.date)} às {game.time}
+          </p>
 
-                    X
 
-                  </span>
+          <p>
+            🏟 {game.field}
+          </p>
 
 
+        </div>
 
-                  {nextGame.opponent}
 
+        <Badge
+          className="
+            mt-4
+            bg-emerald-500
+            text-black
+          "
+        >
 
+          {game.status}
 
-                </h2>
+        </Badge>
 
 
+      </div>
 
+    ))}
 
+  </div>
 
 
+) : (
 
-                <div className="mt-6 space-y-2 text-slate-300">
+  <p className="text-center text-slate-400">
+    Nenhum jogo agendado.
+  </p>
 
+)}
 
-                  <p>
-
-                   🕒 {formatDate(nextGame.date)} às {nextGame.time}
-
-                  </p>
-
-
-
-                  <p>
-
-                    🏟 {nextGame.field}
-
-                  </p>
-
-
-                </div>
-
-
-
-
-
-
-
-                <Badge className="
-                  mt-6
-                  bg-emerald-500
-                  text-black
-                ">
-
-
-                  {nextGame.status}
-
-
-                </Badge>
-
-
-
-
-
-              </div>
-
-
-
-
-            ) : (
-
-
-
-              <p className="text-center text-slate-400">
-
-                Nenhum jogo agendado.
-
-              </p>
-
-
-
-            )}
 
 
 
