@@ -80,13 +80,12 @@ export default function TimesPage() {
 
 
     await updateTeam(
-
-      id,
-
-      newName
-
-    );
-
+  id,
+  {
+    id,
+    name: newName,
+  }
+);
 
   }
 

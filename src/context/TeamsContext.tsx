@@ -30,10 +30,14 @@ interface TeamsContextData {
     name: string
   ) => Promise<boolean>;
 
-  removeTeam: (
-    id: string
-  ) => Promise<void>;
+ removeTeam: (
+  id: string
+) => Promise<void>;
 
+updateTeam: (
+  id: string,
+  team: Team
+) => Promise<void>;
 }
 
 
@@ -183,43 +187,57 @@ export function TeamsProvider({
 
 
   async function removeTeam(
-    id: string
-  ) {
+  id: string
+) {
+
+  await fetch(
+    `/api/teams/${id}`,
+    {
+      method: "DELETE",
+    }
+  );
 
 
-    await fetch(
-      `/api/teams/${id}`,
-      {
+  setTeams((current) =>
+    current.filter(
+      (team) =>
+        team.id !== id
+    )
+  );
 
-        method: "DELETE",
-
-      }
-    );
-
-
-
-    setTeams((current) =>
-
-      current.filter(
-
-        (team) =>
-
-          team.id !== id
-
-      )
-
-    );
-
-
-  }
+}
 
 
 
+async function updateTeam(
+  id: string,
+  team: Team
+) {
+
+  await fetch(
+    `/api/teams/${id}`,
+    {
+      method: "PUT",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify(team),
+    }
+  );
 
 
+  setTeams((current) =>
+    current.map(
+      (item) =>
+        item.id === id
+          ? team
+          : item
+    )
+  );
 
-
-
+}
   return (
 
     <TeamsContext.Provider
@@ -229,6 +247,8 @@ export function TeamsProvider({
         teams,
 
         addTeam,
+
+        updateTeam,
 
         removeTeam,
 
@@ -241,6 +261,7 @@ export function TeamsProvider({
     </TeamsContext.Provider>
 
   );
+
 
 
 }

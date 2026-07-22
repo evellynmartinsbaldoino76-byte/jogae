@@ -155,9 +155,12 @@ export default function JogosPage() {
 
 
         <Select
-          value={selectedTeam}
-          onValueChange={setSelectedTeam}
-        >
+  value={selectedTeam}
+  onValueChange={(value) =>
+    setSelectedTeam(value ?? "todos")
+  }
+>
+        
 
           <SelectTrigger className="w-72">
 
