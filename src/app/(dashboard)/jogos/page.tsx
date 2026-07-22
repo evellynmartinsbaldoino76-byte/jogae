@@ -26,34 +26,27 @@ import { NewGameDialog } from "@/components/jogos/NewGameDialog";
 
 import { useGames } from "@/context/GamesContext";
 
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 interface Game {
-
   id: string;
-
   date: string;
-
   time: string;
-
   field: string;
-
   team: string;
-
   opponent: string;
-
   status: string;
-
 }
 
 
-
-
-
 export default function JogosPage() {
-
-
 
   const {
     games,
@@ -63,146 +56,93 @@ export default function JogosPage() {
   } = useGames();
 
 
-
-
-
-  const [teams, setTeams] =
-    useState<string[]>([]);
-
-
+  const [teams, setTeams] = useState<string[]>([]);
 
   const [editingGame, setEditingGame] =
     useState<Game | null>(null);
 
-
-
   const [openEdit, setOpenEdit] =
     useState(false);
 
-
-
-
+  const [selectedTeam, setSelectedTeam] =
+    useState("todos");
 
 
 
   useEffect(() => {
 
-
     async function loadTeams() {
-
 
       try {
 
+        const response = await fetch("/api/teams");
 
-        const response =
-          await fetch("/api/teams");
-
-
-
-        const data =
-          await response.json();
-
-
-
+        const data = await response.json();
 
         setTeams(
-
           data.map(
-            (team: { name: string }) =>
-              team.name
+            (team: { name: string }) => team.name
           )
-
         );
 
-
-
       } catch (error) {
-
 
         console.error(
           "Erro ao carregar times:",
           error
         );
 
-
       }
-
 
     }
 
 
-
-
     loadTeams();
-
-
 
   }, []);
 
 
 
 
-
-
+  const filteredGames =
+    selectedTeam === "todos"
+      ? games
+      : games.filter(
+          (game) =>
+            game.team === selectedTeam ||
+            game.opponent === selectedTeam
+        );
 
 
 
   return (
 
-
-
     <div className="space-y-8">
-
-
-
 
 
       <div className="flex items-center justify-between">
 
-
-
         <div>
 
-
           <h1 className="text-4xl font-bold text-white">
-
             Jogos agendados ⚽
-
           </h1>
 
 
-
           <p className="mt-2 text-slate-400">
-
             Organize os jogos, horários e adversários.
-
           </p>
-
 
 
         </div>
 
 
 
-
-
-
-
-
         <NewGameDialog
-
-
           teams={teams}
-
-
           games={games}
-
-
           onCreate={addGame}
-
-
         />
-
 
 
       </div>
@@ -211,39 +151,76 @@ export default function JogosPage() {
 
 
 
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+
+        <Select
+          value={selectedTeam}
+          onValueChange={setSelectedTeam}
+        >
+
+          <SelectTrigger className="w-72">
+
+            <SelectValue placeholder="Todos os times" />
+
+          </SelectTrigger>
+
+
+          <SelectContent>
+
+
+            <SelectItem value="todos">
+              Todos os times
+            </SelectItem>
+
+
+            {teams.map((team) => (
+
+              <SelectItem
+                key={team}
+                value={team}
+              >
+                {team}
+              </SelectItem>
+
+            ))}
+
+
+          </SelectContent>
+
+
+        </Select>
 
 
 
 
-      <div className="
-        grid
-        gap-6
-        md:grid-cols-2
-        xl:grid-cols-3
-      ">
+        <p className="text-slate-400">
+
+          {filteredGames.length} jogo
+          {filteredGames.length !== 1 ? "s" : ""} encontrado
+          {filteredGames.length !== 1 ? "s" : ""}
+
+        </p>
+
+
+      </div>
 
 
 
-        {games.length === 0 ? (
 
 
-
-          <Card className="
-            border-white/10
-            bg-white/5
-            backdrop-blur-xl
-          ">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
 
-            <CardContent className="
-              p-6
-              text-center
-              text-slate-400
-            ">
+        {filteredGames.length === 0 ? (
 
 
-              Nenhum jogo agendado.
+          <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
 
+
+            <CardContent className="p-8 text-center text-slate-400">
+
+              Nenhum jogo encontrado para este time.
 
             </CardContent>
 
@@ -255,37 +232,19 @@ export default function JogosPage() {
         ) : (
 
 
-
-          games.map((game) => (
-
+          filteredGames.map((game) => (
 
 
             <Card
-
               key={game.id}
-
-              className="
-                border-white/10
-                bg-white/5
-                backdrop-blur-xl
-              "
-
+              className="border-white/10 bg-white/5 backdrop-blur-xl"
             >
-
-
-
 
 
               <CardHeader>
 
 
-
-                <CardTitle className="
-                  flex
-                  justify-between
-                  text-white
-                ">
-
+                <CardTitle className="flex justify-between text-white">
 
 
                   <span>
@@ -295,8 +254,6 @@ export default function JogosPage() {
                   </span>
 
 
-
-
                   <Badge>
 
                     {game.status}
@@ -304,9 +261,7 @@ export default function JogosPage() {
                   </Badge>
 
 
-
                 </CardTitle>
-
 
 
               </CardHeader>
@@ -315,89 +270,46 @@ export default function JogosPage() {
 
 
 
+              <CardContent className="space-y-3 text-slate-300">
 
 
+                <p className="flex items-center gap-2">
 
-
-              <CardContent className="
-                space-y-3
-                text-slate-300
-              ">
-
-
-
-
-                <p className="flex gap-2 items-center">
-
-
-                  <CalendarDays size={18}/>
-
+                  <CalendarDays size={18} />
 
                   {game.date}
 
-
-
                 </p>
 
 
 
+                <p className="flex items-center gap-2">
 
-
-
-
-                <p className="flex gap-2 items-center">
-
-
-                  <Clock3 size={18}/>
-
+                  <Clock3 size={18} />
 
                   {game.time}
 
-
-
                 </p>
 
 
 
+                <p className="flex items-center gap-2">
 
-
-
-
-
-                <p className="flex gap-2 items-center">
-
-
-                  <MapPin size={18}/>
-
+                  <MapPin size={18} />
 
                   {game.field}
 
-
-
                 </p>
 
 
 
+                <p className="flex items-center gap-2">
 
-
-
-
-
-                <p className="flex gap-2 items-center">
-
-
-                  <Shield size={18}/>
-
+                  <Shield size={18} />
 
                   {game.team}
 
-
-
                 </p>
-
-
-
-
 
 
 
@@ -407,34 +319,17 @@ export default function JogosPage() {
 
 
 
-
-
                   <Button
-
-
                     variant="outline"
-
-
                     className="flex-1"
-
-
                     onClick={() => {
-
 
                       setEditingGame(game);
 
-
                       setOpenEdit(true);
 
-
-
                     }}
-
-
-
                   >
-
-
 
                     <Pencil
                       size={16}
@@ -443,51 +338,28 @@ export default function JogosPage() {
 
                     Editar
 
-
-
                   </Button>
-
-
-
-
 
 
 
 
 
                   <Button
-
-
                     variant="destructive"
-
-
                     className="flex-1"
-
-
                     onClick={() =>
-
                       removeGame(game.id)
-
                     }
-
-
                   >
-
-
 
                     <Trash2
                       size={16}
                       className="mr-2"
                     />
 
-
                     Excluir
 
-
-
                   </Button>
-
-
 
 
 
@@ -495,24 +367,16 @@ export default function JogosPage() {
 
 
 
-
-
               </CardContent>
-
-
-
 
 
             </Card>
 
 
-
           ))
 
 
-
         )}
-
 
 
       </div>
@@ -521,105 +385,56 @@ export default function JogosPage() {
 
 
 
-
-
-
-
       {editingGame && (
-
-
 
         <NewGameDialog
 
-
-
           teams={teams}
 
-
-
           games={games}
-
-
 
           onCreate={addGame}
 
 
+          onUpdate={async (id, game) => {
 
-          onUpdate={async (
-
-            id,
-
-            game
-
-          ) => {
-
-
-
-            await updateGame(
-
-              id,
-
-              game
-
-            );
-
-
+            await updateGame(id, game);
 
             setEditingGame(null);
 
             setOpenEdit(false);
 
-
-
           }}
-
 
 
           editingGame={editingGame}
 
 
-
           open={openEdit}
-
 
 
           onOpenChange={(open) => {
 
-
-
             setOpenEdit(open);
-
 
 
             if (!open) {
 
-
               setEditingGame(null);
 
-
             }
-
-
 
           }}
 
 
-
           showTrigger={false}
 
-
-
         />
-
-
 
       )}
 
 
-
     </div>
-
-
 
   );
 
