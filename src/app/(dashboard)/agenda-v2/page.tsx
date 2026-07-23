@@ -6,35 +6,102 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-
 export default function AgendaV2Page() {
 
   const [currentDate, setCurrentDate] = useState(
     new Date()
   );
 
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
-  function changeMonth(value: number) {
 
-    const newDate = new Date(currentDate);
 
-    newDate.setMonth(
-      newDate.getMonth() + value
+  const monthName =
+    currentDate.toLocaleDateString(
+      "pt-BR",
+      {
+        month: "long",
+        year: "numeric",
+      }
     );
 
-    setCurrentDate(newDate);
+
+
+  const firstDay =
+    new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    ).getDay();
+
+
+
+  const daysInMonth =
+    new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    ).getDate();
+
+
+
+  function previousMonth() {
+
+    setCurrentDate(
+      new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - 1,
+        1
+      )
+    );
+
+    setSelectedDay(null);
 
   }
 
 
 
-  const monthName = currentDate.toLocaleDateString(
-    "pt-BR",
-    {
-      month: "long",
-      year: "numeric",
-    }
-  );
+  function nextMonth() {
+
+    setCurrentDate(
+      new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        1
+      )
+    );
+
+    setSelectedDay(null);
+
+  }
+
+
+
+  const days: (number | null)[] = [];
+
+
+
+  for (
+    let i = 0;
+    i < firstDay;
+    i++
+  ) {
+
+    days.push(null);
+
+  }
+
+
+
+  for (
+    let day = 1;
+    day <= daysInMonth;
+    day++
+  ) {
+
+    days.push(day);
+
+  }
 
 
 
@@ -43,13 +110,13 @@ export default function AgendaV2Page() {
     <div className="space-y-6">
 
 
+      {/* Cabeçalho */}
+
       <div className="flex items-center justify-between">
 
 
         <button
-
-          onClick={() => changeMonth(-1)}
-
+          onClick={previousMonth}
           className="
           rounded-xl
           border
@@ -57,42 +124,34 @@ export default function AgendaV2Page() {
           bg-white/5
           p-3
           text-white
+          transition
           hover:bg-white/10
           "
-
         >
 
-          <ChevronLeft size={22}/>
+          <ChevronLeft />
 
         </button>
 
 
 
-        <div className="text-center">
+        <h1
+          className="
+          text-3xl
+          font-bold
+          capitalize
+          text-white
+          "
+        >
 
+          {monthName}
 
-          <h1 className="text-3xl font-bold text-white capitalize">
-
-            {monthName}
-
-          </h1>
-
-
-          <p className="text-emerald-400">
-
-            Agenda mensal
-
-          </p>
-
-
-        </div>
+        </h1>
 
 
 
         <button
-
-          onClick={() => changeMonth(1)}
-
+          onClick={nextMonth}
           className="
           rounded-xl
           border
@@ -100,12 +159,12 @@ export default function AgendaV2Page() {
           bg-white/5
           p-3
           text-white
+          transition
           hover:bg-white/10
           "
-
         >
 
-          <ChevronRight size={22}/>
+          <ChevronRight />
 
         </button>
 
@@ -116,34 +175,33 @@ export default function AgendaV2Page() {
 
 
 
+      {/* Calendário */}
+
       <div
         className="
         grid
         grid-cols-7
         gap-3
-        rounded-2xl
-        border
-        border-white/10
-        bg-white/5
-        p-6
         "
       >
 
+
         {
           [
+            "Dom",
             "Seg",
             "Ter",
             "Qua",
             "Qui",
             "Sex",
             "Sáb",
-            "Dom",
           ].map((day) => (
 
             <div
               key={day}
               className="
               text-center
+              text-sm
               font-semibold
               text-slate-400
               "
@@ -158,30 +216,47 @@ export default function AgendaV2Page() {
 
 
 
+
         {
-          Array.from({
-            length: 35
-          }).map((_, index) => (
+          days.map((day, index) => (
 
             <div
-
               key={index}
-
               className="
-              flex
-              h-20
-              items-center
-              justify-center
-              rounded-xl
+              min-h-24
+              rounded-2xl
               border
               border-white/10
-              bg-black/20
-              text-white
+              bg-white/5
+              p-3
               "
-
             >
 
-              {index + 1}
+              {
+                day && (
+
+                  <button
+                    onClick={() =>
+                      setSelectedDay(day)
+                    }
+                    className="
+                    flex
+                    h-full
+                    w-full
+                    items-start
+                    text-left
+                    text-white
+                    hover:text-emerald-400
+                    "
+                  >
+
+                    {day}
+
+                  </button>
+
+                )
+              }
+
 
             </div>
 
@@ -190,6 +265,108 @@ export default function AgendaV2Page() {
 
 
       </div>
+
+
+
+
+
+      {/* Painel do dia */}
+
+      {
+        selectedDay && (
+
+          <div
+            className="
+            rounded-2xl
+            border
+            border-white/10
+            bg-white/5
+            p-6
+            text-white
+            backdrop-blur-xl
+            "
+          >
+
+
+            <h2
+              className="
+              text-xl
+              font-bold
+              "
+            >
+
+              Dia {selectedDay}
+
+            </h2>
+
+
+
+            <p
+              className="
+              mt-2
+              text-slate-400
+              "
+            >
+
+              Escolha um horário disponível
+
+            </p>
+
+
+
+            <div
+              className="
+              mt-5
+              grid
+              gap-3
+              md:grid-cols-3
+              "
+            >
+
+
+              {
+                [
+                  "19:30",
+                  "20:30",
+                  "21:30",
+                ].map((time) => (
+
+                  <button
+                    key={time}
+                    className="
+                    rounded-xl
+                    border
+                    border-emerald-400/30
+                    bg-emerald-400/10
+                    p-4
+                    text-emerald-300
+                    transition
+                    hover:bg-emerald-400/20
+                    "
+                  >
+
+                    <strong>
+                      {time}
+                    </strong>
+
+                    <br />
+
+                    Livre
+
+
+                  </button>
+
+                ))
+              }
+
+
+            </div>
+
+
+          </div>
+
+        )
+      }
 
 
     </div>
