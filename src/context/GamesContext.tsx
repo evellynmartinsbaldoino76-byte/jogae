@@ -85,10 +85,11 @@ export function GamesProvider({
 
 
       const data =
-        await response.json();
+  await response.json();
 
+console.log("GAMES RECEBIDOS:", data);
 
-      setGames(data);
+setGames(data);
 
 
     } catch (error) {

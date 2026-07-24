@@ -1,105 +1,46 @@
 "use client";
 
 import { useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  ChevronLeft,
-  ChevronRight,
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+
+import {
+  Clock,
 } from "lucide-react";
+
 
 export default function AgendaV2Page() {
 
-  const [currentDate, setCurrentDate] = useState(
-    new Date()
-  );
-
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
-
+  const [selectedDate, setSelectedDate] =
+    useState<Date | undefined>(
+      new Date()
+    );
 
 
-  const monthName =
-    currentDate.toLocaleDateString(
+  const horarios = [
+    "19:30",
+    "20:30",
+    "21:30",
+  ];
+
+
+
+  function formatDate(date?: Date) {
+
+    if (!date) return "";
+
+    return date.toLocaleDateString(
       "pt-BR",
       {
+        weekday: "long",
+        day: "2-digit",
         month: "long",
         year: "numeric",
       }
     );
-
-
-
-  const firstDay =
-    new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      1
-    ).getDay();
-
-
-
-  const daysInMonth =
-    new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      0
-    ).getDate();
-
-
-
-  function previousMonth() {
-
-    setCurrentDate(
-      new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() - 1,
-        1
-      )
-    );
-
-    setSelectedDay(null);
-
-  }
-
-
-
-  function nextMonth() {
-
-    setCurrentDate(
-      new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() + 1,
-        1
-      )
-    );
-
-    setSelectedDay(null);
-
-  }
-
-
-
-  const days: (number | null)[] = [];
-
-
-
-  for (
-    let i = 0;
-    i < firstDay;
-    i++
-  ) {
-
-    days.push(null);
-
-  }
-
-
-
-  for (
-    let day = 1;
-    day <= daysInMonth;
-    day++
-  ) {
-
-    days.push(day);
 
   }
 
@@ -107,66 +48,36 @@ export default function AgendaV2Page() {
 
   return (
 
-    <div className="space-y-6">
+    <div className="space-y-8">
 
 
-      {/* Cabeçalho */}
+      {/* Título */}
 
-      <div className="flex items-center justify-between">
-
-
-        <button
-          onClick={previousMonth}
-          className="
-          rounded-xl
-          border
-          border-white/10
-          bg-white/5
-          p-3
-          text-white
-          transition
-          hover:bg-white/10
-          "
-        >
-
-          <ChevronLeft />
-
-        </button>
-
-
+      <div>
 
         <h1
           className="
           text-3xl
           font-bold
-          capitalize
           text-white
           "
         >
 
-          {monthName}
+          Agenda de Jogos
 
         </h1>
 
 
-
-        <button
-          onClick={nextMonth}
+        <p
           className="
-          rounded-xl
-          border
-          border-white/10
-          bg-white/5
-          p-3
-          text-white
-          transition
-          hover:bg-white/10
+          mt-2
+          text-slate-400
           "
         >
 
-          <ChevronRight />
+          Escolha uma data para visualizar horários disponíveis.
 
-        </button>
+        </p>
 
 
       </div>
@@ -175,115 +86,79 @@ export default function AgendaV2Page() {
 
 
 
-      {/* Calendário */}
 
       <div
         className="
         grid
-        grid-cols-7
-        gap-3
+        gap-6
+        lg:grid-cols-[420px_1fr]
         "
       >
 
 
-        {
-          [
-            "Dom",
-            "Seg",
-            "Ter",
-            "Qua",
-            "Qui",
-            "Sex",
-            "Sáb",
-          ].map((day) => (
-
-            <div
-              key={day}
-              className="
-              text-center
-              text-sm
-              font-semibold
-              text-slate-400
-              "
-            >
-
-              {day}
-
-            </div>
-
-          ))
-        }
 
 
 
+        {/* Calendário */}
 
-        {
-          days.map((day, index) => (
+        <Card
+          className="
+          border-white/10
+          bg-white/5
+          backdrop-blur-xl
+          shadow-xl
+          "
+        >
 
-            <div
-              key={index}
-              className="
-              min-h-24
-              rounded-2xl
-              border
-              border-white/10
-              bg-white/5
-              p-3
-              "
-            >
-
-              {
-                day && (
-
-                  <button
-                    onClick={() =>
-                      setSelectedDay(day)
-                    }
-                    className="
-                    flex
-                    h-full
-                    w-full
-                    items-start
-                    text-left
-                    text-white
-                    hover:text-emerald-400
-                    "
-                  >
-
-                    {day}
-
-                  </button>
-
-                )
-              }
-
-
-            </div>
-
-          ))
-        }
-
-
-      </div>
-
-
-
-
-
-      {/* Painel do dia */}
-
-      {
-        selectedDay && (
-
-          <div
+          <CardContent
             className="
-            rounded-2xl
-            border
-            border-white/10
-            bg-white/5
+            p-5
+            "
+          >
+
+            <Calendar
+
+              mode="single"
+
+              selected={selectedDate}
+
+              onSelect={setSelectedDate}
+
+              className="
+              rounded-xl
+              text-white
+              "
+
+            />
+
+
+          </CardContent>
+
+
+        </Card>
+
+
+
+
+
+
+
+        {/* Horários */}
+
+        <Card
+
+          className="
+          border-white/10
+          bg-white/5
+          backdrop-blur-xl
+          shadow-xl
+          "
+
+        >
+
+          <CardContent
+            className="
             p-6
-            text-white
-            backdrop-blur-xl
             "
           >
 
@@ -291,11 +166,12 @@ export default function AgendaV2Page() {
             <h2
               className="
               text-xl
-              font-bold
+              font-semibold
+              text-white
               "
             >
 
-              Dia {selectedDay}
+              {formatDate(selectedDate)}
 
             </h2>
 
@@ -308,53 +184,95 @@ export default function AgendaV2Page() {
               "
             >
 
-              Escolha um horário disponível
+              Horários disponíveis
 
             </p>
 
 
 
+
+
             <div
               className="
-              mt-5
+              mt-6
               grid
-              gap-3
+              gap-4
               md:grid-cols-3
               "
             >
 
 
               {
-                [
-                  "19:30",
-                  "20:30",
-                  "21:30",
-                ].map((time) => (
+                horarios.map((horario) => (
 
                   <button
-                    key={time}
+
+                    key={horario}
+
                     className="
-                    rounded-xl
+                    group
+                    rounded-2xl
                     border
-                    border-emerald-400/30
+                    border-emerald-400/20
                     bg-emerald-400/10
-                    p-4
-                    text-emerald-300
+                    p-5
+                    text-left
                     transition
+                    duration-300
+                    hover:-translate-y-1
+                    hover:border-emerald-400/50
                     hover:bg-emerald-400/20
                     "
+
                   >
 
-                    <strong>
-                      {time}
-                    </strong>
 
-                    <br />
+                    <div
+                      className="
+                      flex
+                      items-center
+                      gap-2
+                      text-emerald-300
+                      "
+                    >
 
-                    Livre
+                      <Clock
+                        size={18}
+                      />
+
+
+                      <span
+                        className="
+                        font-semibold
+                        "
+                      >
+
+                        {horario}
+
+                      </span>
+
+
+                    </div>
+
+
+
+
+                    <p
+                      className="
+                      mt-3
+                      text-sm
+                      text-slate-300
+                      "
+                    >
+
+                      Disponível
+
+                    </p>
+
 
 
                   </button>
+
 
                 ))
               }
@@ -363,10 +281,16 @@ export default function AgendaV2Page() {
             </div>
 
 
-          </div>
+          </CardContent>
 
-        )
-      }
+
+        </Card>
+
+
+
+
+      </div>
+
 
 
     </div>

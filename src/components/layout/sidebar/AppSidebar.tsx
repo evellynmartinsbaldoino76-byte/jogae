@@ -96,52 +96,61 @@ export function AppSidebar() {
 
 
 
-          <SidebarGroupLabel
+         <SidebarGroupLabel
+  className="
+    flex
+    flex-col
+    items-start
+    px-6
+    py-8
+  "
+>
+  <div className="flex items-center">
+    <span
+      className="
+        text-2xl
+        font-black
+        tracking-tight
+        text-white
+      "
+    >
+      Joga
+    </span>
 
-            className="
-            flex
-            items-center
-            px-5
-            py-8
-            text-xl
-            font-bold
-            tracking-tight
-            text-white
-            "
+    <span
+      className="
+        text-2xl
+        font-black
+        tracking-tight
+        text-emerald-400
+      "
+    >
+      ê
+    </span>
+  </div>
 
-          >
+  <div
+    className="
+      mt-2
+      h-1
+      w-8
+      rounded-full
+      bg-emerald-400
+    "
+  />
 
+  <span
+    className="
+      mt-3
+      text-xs
+      font-medium
+      text-slate-400
+    "
+  >
+    Organize seus jogos
+  </span>
 
-            <span
-
-              className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-xl
-              bg-emerald-400/10
-              text-xl
-              ring-1
-              ring-emerald-400/20
-              "
-
-            >
-
-              ⚽
-
-            </span>
-
-
-            <span className="ml-3">
-
-              Jogaê
-
-            </span>
-
-
-          </SidebarGroupLabel>
+</SidebarGroupLabel>
 
 
 
