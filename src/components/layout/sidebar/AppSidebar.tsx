@@ -26,7 +26,6 @@ import {
 
 
 const items = [
-
   {
     title: "Dashboard",
     url: "/dashboard",
@@ -47,10 +46,9 @@ const items = [
 
   {
     title: "Agenda",
-    url: "/agenda",
+    url: "/agenda-v2",
     icon: Clock3,
   },
-
 ];
 
 
