@@ -27,11 +27,11 @@ interface TeamActionsProps {
     id: string,
     newName: string,
     shieldUrl?: string | null
-  ) => Promise<any>;
+  ) => Promise<void>;
 
   onDelete: (
     id: string
-  ) => Promise<any>;
+  ) => Promise<void>;
 }
 
 export function TeamActions({
@@ -68,11 +68,38 @@ export function TeamActions({
     setUploading(true);
 
     try {
+      if (!file.type.startsWith("image/")) {
+        setError(
+          "Escolha uma imagem válida."
+        );
+
+        return;
+      }
+
+      const maxSize =
+        5 * 1024 * 1024;
+
+      if (file.size > maxSize) {
+        setError(
+          "A imagem deve ter no máximo 5 MB."
+        );
+
+        return;
+      }
+
       const fileExtension =
-        file.name.split(".").pop();
+        file.name
+          .split(".")
+          .pop()
+          ?.toLowerCase() || "png";
+
+      /*
+       * Todos os escudos dos times
+       * ficam dentro da mesma pasta.
+       */
 
       const fileName =
-        `${team.id}-${Date.now()}.${fileExtension}`;
+        `times/${team.id}-${Date.now()}.${fileExtension}`;
 
       const {
         error: uploadError,
@@ -90,6 +117,11 @@ export function TeamActions({
           );
 
       if (uploadError) {
+        console.error(
+          "Erro no upload:",
+          uploadError
+        );
+
         throw uploadError;
       }
 
@@ -102,8 +134,19 @@ export function TeamActions({
             fileName
           );
 
+      const publicUrl =
+        publicUrlData.publicUrl;
+
+      if (!publicUrl) {
+        setError(
+          "Não foi possível obter a URL do escudo."
+        );
+
+        return;
+      }
+
       setShieldUrl(
-        publicUrlData.publicUrl
+        publicUrl
       );
     } catch (error) {
       console.error(
@@ -116,6 +159,8 @@ export function TeamActions({
       );
     } finally {
       setUploading(false);
+
+      event.target.value = "";
     }
   }
 
@@ -131,14 +176,33 @@ export function TeamActions({
       return;
     }
 
-    await onEdit(
-      team.id,
-      trimmedName,
-      shieldUrl || null
-    );
+    if (uploading) {
+      setError(
+        "Aguarde o upload do escudo terminar."
+      );
 
-    setOpen(false);
-    setError("");
+      return;
+    }
+
+    try {
+      await onEdit(
+        team.id,
+        trimmedName,
+        shieldUrl || null
+      );
+
+      setOpen(false);
+      setError("");
+    } catch (error) {
+      console.error(
+        "Erro ao editar time:",
+        error
+      );
+
+      setError(
+        "Não foi possível atualizar o time."
+      );
+    }
   }
 
   function handleOpenChange(
@@ -281,6 +345,7 @@ export function TeamActions({
                   gap-4
                 "
               >
+
                 <div
                   className="
                     flex
@@ -290,10 +355,13 @@ export function TeamActions({
                     justify-center
                   "
                 >
+
                   {shieldUrl ? (
                     <img
                       src={shieldUrl}
                       alt={`Escudo do ${name}`}
+                      loading="lazy"
+                      decoding="async"
                       className="
                         max-h-24
                         max-w-32
@@ -302,6 +370,11 @@ export function TeamActions({
                         drop-shadow-lg
                       "
                       onError={(event) => {
+                        console.error(
+                          "Erro ao carregar escudo:",
+                          shieldUrl
+                        );
+
                         event.currentTarget.style.display =
                           "none";
                       }}
@@ -316,6 +389,7 @@ export function TeamActions({
                       ⚽
                     </span>
                   )}
+
                 </div>
 
                 {/* TROCAR ESCUDO */}
@@ -366,11 +440,13 @@ export function TeamActions({
                     disabled={uploading}
                   />
                 </label>
+
               </div>
 
               {/* NOME DO TIME */}
 
               <div>
+
                 <label
                   htmlFor={`team-name-${team.id}`}
                   className="
@@ -425,6 +501,7 @@ export function TeamActions({
                     focus:ring-emerald-400/10
                   "
                 />
+
               </div>
 
               {/* ERRO */}
@@ -529,6 +606,7 @@ export function TeamActions({
       >
         Excluir
       </Button>
+
     </div>
   );
 }
