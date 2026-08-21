@@ -22,28 +22,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-
 interface Game {
-
   id: string;
-
   date: string;
-
   time: string;
-
   field: string;
-
   team: string;
-
   opponent: string;
-
   status: string;
-
 }
 
-
 interface NewGameDialogProps {
-
   teams: string[];
 
   games: Game[];
@@ -68,91 +57,47 @@ interface NewGameDialogProps {
   initialDate?: string;
 
   initialTime?: string;
-
 }
 
-
-
 const horariosDisponiveis = [
-
   "19:30",
   "20:30",
   "21:30",
-
 ];
 
-
-
-
 export function NewGameDialog({
-
   teams,
-
   games,
-
   onCreate,
-
   onUpdate,
-
   editingGame,
-
   open,
-
   onOpenChange,
-
   showTrigger = true,
-
   initialDate,
-
   initialTime,
-
 }: NewGameDialogProps) {
-
-
-
-  const [date, setDate] =
-    useState("");
-
-  const [time, setTime] =
-    useState("");
-
-  const [team, setTeam] =
-    useState("");
-
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [team, setTeam] = useState("");
   const [opponent, setOpponent] =
     useState("");
 
-
-
-
   useEffect(() => {
-
-
     if (editingGame) {
-
-
       setDate(editingGame.date);
 
       setTime(editingGame.time);
 
       setTeam(editingGame.team);
 
-
       setOpponent(
-
         editingGame.opponent ===
-        "Aguardando adversário"
-
+          "Aguardando adversário"
           ? ""
-
           : editingGame.opponent
-
       );
-
-
     } else {
-
-
       setDate(initialDate ?? "");
 
       setTime(initialTime ?? "");
@@ -160,143 +105,67 @@ export function NewGameDialog({
       setTeam("");
 
       setOpponent("");
-
-
     }
-
-
   }, [
     editingGame,
     initialDate,
-    initialTime
+    initialTime,
   ]);
 
-
-
-
-
   function horariosLivres() {
-
-
     const ocupados = games
-
       .filter(
-
         (game) =>
-
           game.date === date &&
-
           game.id !== editingGame?.id
-
       )
-
       .map(
-
         (game) => game.time
-
       );
 
-
-
     return horariosDisponiveis.filter(
-
       (horario) =>
-
         !ocupados.includes(horario)
-
     );
-
-
   }
 
-
-
-
-
   function handleSave() {
-
-
-
     if (!date || !time || !team) {
-
       return;
-
     }
 
-
-
     const game: Game = {
-
-
       id:
-
         editingGame?.id ??
-
         crypto.randomUUID(),
-
-
 
       date,
 
-
       time,
 
-
-
       field:
-
         "Associação da Polícia",
-
-
 
       team,
 
-
-
       opponent:
-
         opponent ||
-
         "Aguardando adversário",
 
-
-
       status:
-
         opponent
-
           ? "Confirmado"
-
           : "Aguardando adversário",
-
-
     };
 
-
-
-
     if (editingGame) {
-
-
       onUpdate?.(
-
         editingGame.id,
-
         game
-
       );
-
-
     } else {
-
-
       onCreate(game);
-
-
     }
-
-
-
 
     setDate("");
 
@@ -306,374 +175,320 @@ export function NewGameDialog({
 
     setOpponent("");
 
-
-
     onOpenChange?.(false);
-
-
-
   }
 
-
-
-
-   return (
-
+  return (
     <Dialog
-
       open={open}
-
       onOpenChange={onOpenChange}
-
     >
-
+      {/* BOTÃO NOVO JOGO */}
 
       {showTrigger && (
-
-
-        <DialogTrigger>
-
-
-          <Button>
-
-            + Novo jogo
-
-          </Button>
-
-
+        <DialogTrigger
+          className="
+            inline-flex
+            h-11
+            items-center
+            justify-center
+            gap-2
+            rounded-xl
+            bg-emerald-500
+            px-5
+            text-sm
+            font-semibold
+            text-slate-950
+            shadow-lg
+            shadow-emerald-500/10
+            transition-all
+            duration-200
+            hover:-translate-y-0.5
+            hover:bg-emerald-400
+            hover:shadow-xl
+            hover:shadow-emerald-500/20
+            active:translate-y-0
+            active:scale-[0.98]
+          "
+        >
+          + Novo jogo
         </DialogTrigger>
-
-
       )}
 
+      {/* CONTEÚDO */}
 
-
-
-      <DialogContent>
-
-
-
+      <DialogContent
+        className="
+          rounded-2xl
+          border-white/10
+          bg-slate-950
+          text-white
+          shadow-2xl
+        "
+      >
         <DialogHeader>
-
-
-          <DialogTitle>
-
-
+          <DialogTitle
+            className="
+              text-xl
+              font-bold
+              text-white
+            "
+          >
             {editingGame
-
-              ? "Editar jogo ⚽"
-
-              : "Novo jogo ⚽"
-
-            }
-
-
+              ? "Editar jogo"
+              : "Novo jogo"}
           </DialogTitle>
-
-
         </DialogHeader>
 
-
-
-
-
-        <div className="space-y-4">
-
-
-
-
-
-          <Input
-
-            type="date"
-
-            value={date}
-
-            onChange={(e) =>
-
-              setDate(e.target.value)
-
-            }
-
-          />
-
-
-
-
-
-
-
-          <Select
-
-            value={time}
-
-            onValueChange={(value) =>
-
-              setTime(value ?? "")
-
-            }
-
-            disabled={!date}
-
-          >
-
-
-            <SelectTrigger>
-
-
-              <SelectValue
-
-                placeholder="Escolha o horário"
-
-              />
-
-
-            </SelectTrigger>
-
-
-
-
-            <SelectContent>
-
-
-              {horariosLivres().map((horario) => (
-
-
-                <SelectItem
-
-                  key={horario}
-
-                  value={horario}
-
-                >
-
-                  {horario}
-
-                </SelectItem>
-
-
-              ))}
-
-
-            </SelectContent>
-
-
-          </Select>
-
-
-
-
-
-
-
-          <div className="rounded-md border p-3 text-sm">
-
-
-            📍 Local:
-
-            <strong className="ml-2">
-
-              Associação da Polícia
-
-            </strong>
-
-
+        <div className="space-y-5">
+
+          {/* DATA */}
+
+          <div className="space-y-2">
+            <label
+              className="
+                text-sm
+                font-medium
+                text-slate-300
+              "
+            >
+              Data
+            </label>
+
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) =>
+                setDate(e.target.value)
+              }
+              className="
+                h-11
+                rounded-xl
+                border-white/10
+                bg-white/5
+                text-white
+              "
+            />
           </div>
 
+          {/* HORÁRIO */}
 
+          <div className="space-y-2">
+            <label
+              className="
+                text-sm
+                font-medium
+                text-slate-300
+              "
+            >
+              Horário
+            </label>
 
+            <Select
+              value={time}
+              onValueChange={(value) =>
+                setTime(value ?? "")
+              }
+              disabled={!date}
+            >
+              <SelectTrigger
+                className="
+                  h-11
+                  rounded-xl
+                  border-white/10
+                  bg-white/5
+                  text-white
+                "
+              >
+                <SelectValue
+                  placeholder="Escolha o horário"
+                />
+              </SelectTrigger>
 
+              <SelectContent
+                className="
+                  rounded-xl
+                  border-white/10
+                  bg-slate-950
+                  text-white
+                "
+              >
+                {horariosLivres().map(
+                  (horario) => (
+                    <SelectItem
+                      key={horario}
+                      value={horario}
+                    >
+                      {horario}
+                    </SelectItem>
+                  )
+                )}
+              </SelectContent>
+            </Select>
+          </div>
 
+          {/* LOCAL */}
 
-
-          <Select
-
-            value={team}
-
-            onValueChange={(value) =>
-
-              setTeam(value ?? "")
-
-            }
-
+          <div
+            className="
+              rounded-xl
+              border
+              border-white/10
+              bg-white/5
+              p-4
+              text-sm
+              text-slate-400
+            "
           >
+            <span>📍 Local:</span>
 
+            <strong
+              className="
+                ml-2
+                font-semibold
+                text-white
+              "
+            >
+              Associação da Polícia
+            </strong>
+          </div>
 
-            <SelectTrigger>
+          {/* SEU TIME */}
 
+          <div className="space-y-2">
+            <label
+              className="
+                text-sm
+                font-medium
+                text-slate-300
+              "
+            >
+              Seu time
+            </label>
 
-              <SelectValue
+            <Select
+              value={team}
+              onValueChange={(value) =>
+                setTeam(value ?? "")
+              }
+            >
+              <SelectTrigger
+                className="
+                  h-11
+                  rounded-xl
+                  border-white/10
+                  bg-white/5
+                  text-white
+                "
+              >
+                <SelectValue
+                  placeholder="Escolha seu time"
+                />
+              </SelectTrigger>
 
-                placeholder="Escolha seu time"
+              <SelectContent
+                className="
+                  rounded-xl
+                  border-white/10
+                  bg-slate-950
+                  text-white
+                "
+              >
+                {teams.map((item) => (
+                  <SelectItem
+                    key={item}
+                    value={item}
+                  >
+                    {item}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-              />
+          {/* ADVERSÁRIO */}
 
+          <div className="space-y-2">
+            <label
+              className="
+                text-sm
+                font-medium
+                text-slate-300
+              "
+            >
+              Adversário
+            </label>
 
-            </SelectTrigger>
+            <Select
+              value={opponent}
+              onValueChange={(value) =>
+                setOpponent(value ?? "")
+              }
+            >
+              <SelectTrigger
+                className="
+                  h-11
+                  rounded-xl
+                  border-white/10
+                  bg-white/5
+                  text-white
+                "
+              >
+                <SelectValue
+                  placeholder="Escolha o adversário"
+                />
+              </SelectTrigger>
 
-
-
-
-
-            <SelectContent>
-
-
-              {teams.map((item) => (
-
-
+              <SelectContent
+                className="
+                  rounded-xl
+                  border-white/10
+                  bg-slate-950
+                  text-white
+                "
+              >
                 <SelectItem
-
-                  key={item}
-
-                  value={item}
-
+                  value="Aguardando adversário"
                 >
-
-                  {item}
-
+                  Aguardando adversário
                 </SelectItem>
 
-
-              ))}
-
-
-            </SelectContent>
-
-
-          </Select>
-
-
-
-
-
-
-
-          <Select
-
-            value={opponent}
-
-            onValueChange={(value) =>
-
-              setOpponent(value ?? "")
-
-            }
-
-          >
-
-
-            <SelectTrigger>
-
-
-              <SelectValue
-
-                placeholder="Escolha o adversário"
-
-              />
-
-
-            </SelectTrigger>
-
-
-
-
-
-            <SelectContent>
-
-
-
-              <SelectItem value="Aguardando adversário">
-
-                Aguardando adversário
-
-              </SelectItem>
-
-
-
-
-
-
-
-              {teams
-
-                .filter(
-
-                  (item) =>
-
-                    item !== team
-
-                )
-
-                .map((item) => (
-
-
+                {teams.map((item) => (
                   <SelectItem
-
                     key={item}
-
                     value={item}
-
                   >
-
                     {item}
-
                   </SelectItem>
-
-
                 ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-
-
-            </SelectContent>
-
-
-          </Select>
-
-
-
-
-
-
+          {/* SALVAR */}
 
           <Button
-
-            className="w-full"
-
+            type="button"
+            className="
+              h-11
+              w-full
+              rounded-xl
+              bg-emerald-500
+              font-semibold
+              text-slate-950
+              transition-all
+              hover:bg-emerald-400
+              active:scale-[0.98]
+            "
             onClick={handleSave}
-
           >
-
-
             {editingGame
-
               ? "Salvar alterações"
-
-              : "Salvar jogo"
-
-            }
-
-
+              : "Salvar jogo"}
           </Button>
 
-
-
-
-
         </div>
-
-
-
-
-
       </DialogContent>
-
-
-
-
-
     </Dialog>
-
-
   );
-
-
 }

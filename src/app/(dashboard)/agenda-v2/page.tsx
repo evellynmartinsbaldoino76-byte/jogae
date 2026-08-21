@@ -1,7 +1,9 @@
+
 "use client";
 
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
+
 import {
   Card,
   CardContent,
@@ -27,12 +29,23 @@ export default function AgendaV2Page() {
   ];
 
 
+  function capitalize(text: string) {
+
+    if (!text) return "";
+
+    return (
+      text.charAt(0).toUpperCase() +
+      text.slice(1)
+    );
+
+  }
+
 
   function formatDate(date?: Date) {
 
     if (!date) return "";
 
-    return date.toLocaleDateString(
+    const formatted = date.toLocaleDateString(
       "pt-BR",
       {
         weekday: "long",
@@ -42,8 +55,9 @@ export default function AgendaV2Page() {
       }
     );
 
-  }
+    return capitalize(formatted);
 
+  }
 
 
   return (
@@ -83,10 +97,6 @@ export default function AgendaV2Page() {
       </div>
 
 
-
-
-
-
       <div
         className="
         grid
@@ -94,9 +104,6 @@ export default function AgendaV2Page() {
         lg:grid-cols-[420px_1fr]
         "
       >
-
-
-
 
 
         {/* Calendário */}
@@ -138,11 +145,6 @@ export default function AgendaV2Page() {
         </Card>
 
 
-
-
-
-
-
         {/* Horários */}
 
         <Card
@@ -176,7 +178,6 @@ export default function AgendaV2Page() {
             </h2>
 
 
-
             <p
               className="
               mt-2
@@ -187,9 +188,6 @@ export default function AgendaV2Page() {
               Horários disponíveis
 
             </p>
-
-
-
 
 
             <div
@@ -255,8 +253,6 @@ export default function AgendaV2Page() {
                     </div>
 
 
-
-
                     <p
                       className="
                       mt-3
@@ -270,9 +266,7 @@ export default function AgendaV2Page() {
                     </p>
 
 
-
                   </button>
-
 
                 ))
               }
@@ -287,10 +281,7 @@ export default function AgendaV2Page() {
         </Card>
 
 
-
-
       </div>
-
 
 
     </div>
@@ -298,3 +289,4 @@ export default function AgendaV2Page() {
   );
 
 }
+

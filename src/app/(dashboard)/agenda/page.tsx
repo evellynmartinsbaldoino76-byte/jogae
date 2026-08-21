@@ -3,690 +3,518 @@
 import { useState } from "react";
 
 import {
-  ChevronLeft,
-  ChevronRight,
+  CalendarDays,
+  MapPin,
+  Plus,
+  Users,
+  Trophy,
 } from "lucide-react";
 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-import { ScheduleCard } from "@/components/agenda/ScheduleCard";
+import { Badge } from "@/components/ui/badge";
+
+import { Button } from "@/components/ui/button";
+
+import { useGames } from "@/context/GamesContext";
+import { useTeams } from "@/context/TeamsContext";
 
 import { NewGameDialog } from "@/components/jogos/NewGameDialog";
 
-import { DeleteGameDialog } from "@/components/jogos/DeleteGameDialog";
 
-import {
-  useGames,
-  Game,
-} from "@/context/GamesContext";
+export default function DashboardPage() {
 
-import { teams } from "@/lib/teams";
+  const { games, addGame } = useGames();
 
+  const { teams } = useTeams();
 
+  const teamsCount = teams.length;
 
 
+  const [dialogOpen, setDialogOpen] =
+    useState(false);
 
-export default function AgendaPage() {
 
+  const now = new Date();
 
-  const [selectedDate, setSelectedDate] = useState(
-    new Date()
-  );
 
+  const futureGames = [...games]
+    .filter((game) => {
 
-  const [dialogOpen, setDialogOpen] = useState(false);
+      const gameDate = new Date(
+        `${game.date}T${game.time}`
+      );
 
+      return gameDate >= now;
 
-  const [selectedTime, setSelectedTime] = useState("");
+    })
+    .sort((a, b) => {
 
+      const dateA = new Date(
+        `${a.date}T${a.time}`
+      );
 
-  const [editingGame, setEditingGame] = useState<Game | null>(null);
+      const dateB = new Date(
+        `${b.date}T${b.time}`
+      );
 
+      return (
+        dateA.getTime() -
+        dateB.getTime()
+      );
 
-  const [deletingGame, setDeletingGame] = useState<Game | null>(null);
+    });
 
 
+  const nextGameDate =
+    futureGames.length > 0
+      ? futureGames[0].date
+      : null;
 
-  const {
-    games,
-    addGame,
-    updateGame,
-    removeGame,
-  } = useGames();
 
+  const nextGames =
+    nextGameDate
+      ? futureGames.filter(
+          (game) =>
+            game.date === nextGameDate
+        )
+      : [];
 
 
+  function formatDate(date: string) {
 
-
-  const horarios = [
-
-    "19:30",
-
-    "20:30",
-
-    "21:30",
-
-  ];
-
-
-
-
-
-
-
-  function changeDay(value: number) {
-
-
-    const newDate = new Date(selectedDate);
-
-
-    newDate.setDate(
-      newDate.getDate() + value
-    );
-
-
-    setSelectedDate(newDate);
-
-
-  }
-
-
-
-
-
-
-
-  function getWeekDay(date: Date) {
-
-
-    return new Intl.DateTimeFormat(
-
-      "pt-BR",
-
-      {
-        weekday: "long",
-      }
-
-    )
-
-      .format(date)
-
-      .toUpperCase();
-
-
-  }
-
-
-
-
-
-
-
-  function getFullDate(date: Date) {
-
-
-    return new Intl.DateTimeFormat(
-
-      "pt-BR",
-
-      {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }
-
-    )
-
-      .format(date)
-
-      .toUpperCase();
-
-
-  }
-
-
-
-
-
-
-
-  function formatDate(date: Date) {
-
+    const formatted =
+      new Date(
+        `${date}T00:00:00`
+      ).toLocaleDateString(
+        "pt-BR",
+        {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        }
+      );
 
     return (
-
-      date.getFullYear()
-
-      +
-
-      "-" +
-
-      String(
-        date.getMonth() + 1
-      ).padStart(2, "0")
-
-      +
-
-      "-" +
-
-      String(
-        date.getDate()
-      ).padStart(2, "0")
-
+      formatted.charAt(0).toUpperCase() +
+      formatted.slice(1)
     );
 
-
   }
-
-
-
-
-
-
-
-
-  function getGameByTime(time: string) {
-
-
-    return games.find(
-
-      (game) =>
-
-        game.date === formatDate(selectedDate)
-
-        &&
-
-        game.time === time
-
-    );
-
-
-  }
-
-
-
-
-
-
-
-  function handleSchedule(time: string) {
-
-
-    setEditingGame(null);
-
-    setSelectedTime(time);
-
-    setDialogOpen(true);
-
-
-  }
-
-
-
-
-
-
-
-  function handleEdit(game: Game) {
-
-
-    setEditingGame(game);
-
-    setSelectedTime(game.time);
-
-    setDialogOpen(true);
-
-
-  }
-
-
-
-
-
-
-
-  function handleDelete(game: Game) {
-
-
-    setDeletingGame(game);
-
-
-  }
-
-
-
-
-
 
 
   return (
 
+    <main
+      className="
+      min-h-screen
+      bg-gradient-to-br
+      from-emerald-950
+      via-slate-950
+      to-blue-950
+      p-6
+      "
+    >
 
-    <div className="space-y-8">
-
-
-
-
-
-
-
-      <div
-
-        className="
-        flex
-        items-center
-        justify-between
-        "
-
-      >
+      <div className="space-y-8">
 
 
+        <div>
 
-
-
-        <div
-
-          className="
-          flex
-          items-center
-          gap-4
-          "
-
-        >
-
-
-
-          <button
-
-            onClick={() => changeDay(-1)}
-
+          <h1
             className="
-            rounded-xl
-            border
-            border-white/10
-            bg-white/5
-            p-3
+            text-4xl
+            font-bold
             text-white
-            transition
-            hover:bg-white/10
             "
-
           >
 
-            <ChevronLeft size={22}/>
+            Olá!
+
+          </h1>
 
 
-          </button>
-
-
-
-
-
-
-          <div className="text-center">
-
-
-            <p className="text-sm font-semibold text-emerald-400">
-
-              {getWeekDay(selectedDate)}
-
-            </p>
-
-
-
-            <p className="text-2xl font-bold text-white">
-
-              {getFullDate(selectedDate)}
-
-            </p>
-
-
-
-          </div>
-
-
-
-
-
-
-          <button
-
-            onClick={() => changeDay(1)
-
-            }
-
+          <p
             className="
-            rounded-xl
-            border
-            border-white/10
-            bg-white/5
-            p-3
-            text-white
-            transition
-            hover:bg-white/10
+            mt-2
+            text-slate-300
             "
-
           >
 
-            <ChevronRight size={22}/>
+            Bem-vindo ao painel de controle do Jogaê.
 
-
-          </button>
-
-
+          </p>
 
         </div>
 
 
-
-      </div>
-
-
-
-
-
-
-
+        <div
+          className="
+          grid
+          gap-6
+          md:grid-cols-3
+          "
+        >
 
 
-      <div
+          <Card
+            className="
+            border-white/10
+            bg-white/5
+            text-white
+            backdrop-blur-xl
+            "
+          >
 
-        className="
-        grid
-        gap-5
-        md:grid-cols-3
-        "
+            <CardHeader>
 
-      >
-
-
-
-
-        {
-
-          horarios.map((horario) => {
-
-
-            const game = getGameByTime(horario);
-
-
-
-
-            return (
-
-              <ScheduleCard
-
-                key={horario}
-
-                time={horario}
-
-                status={
-
-                  game
-
-                    ? "Agendado"
-
-                    : "Livre"
-
-                }
-
-                teams={
-
-                  game
-
-                    ? `${game.team} x ${game.opponent}`
-
-                    : undefined
-
-                }
-
-                onSchedule={() =>
-
-                  handleSchedule(horario)
-
-                }
-
-
-                onEdit={() =>
-
-                  game && handleEdit(game)
-
-                }
-
-
-                onDelete={() =>
-
-                  game && handleDelete(game)
-
-                }
-
-
+              <CalendarDays
+                className="text-emerald-400"
               />
 
+              <CardTitle>
 
-            );
+                Jogos
 
+              </CardTitle>
 
-          })
-
-        }
-
-
-
-      </div>
+            </CardHeader>
 
 
+            <CardContent>
+
+              <p
+                className="
+                text-5xl
+                font-bold
+                text-emerald-400
+                "
+              >
+
+                {games.length}
+
+              </p>
 
 
+              <p
+                className="
+                mt-2
+                text-slate-400
+                "
+              >
+
+                jogos confirmados
+
+              </p>
+
+            </CardContent>
+
+          </Card>
 
 
+          <Card
+            className="
+            border-white/10
+            bg-white/5
+            text-white
+            backdrop-blur-xl
+            "
+          >
+
+            <CardHeader>
+
+              <Users
+                className="text-emerald-400"
+              />
+
+              <CardTitle>
+
+                Meus times
+
+              </CardTitle>
+
+            </CardHeader>
 
 
+            <CardContent>
 
-      <div>
+              <p
+                className="
+                text-5xl
+                font-bold
+                text-emerald-400
+                "
+              >
 
+                {teamsCount}
 
-        <h2
-
-          className="
-          mb-4
-          text-xl
-          font-semibold
-          text-white
-          "
-
-        >
-
-          Horário personalizado
+              </p>
 
 
-        </h2>
+              <p
+                className="
+                mt-2
+                text-slate-400
+                "
+              >
+
+                times cadastrados
+
+              </p>
+
+            </CardContent>
+
+          </Card>
 
 
+          <Card
+            className="
+            border-white/10
+            bg-white/5
+            text-white
+            backdrop-blur-xl
+            "
+          >
+
+            <CardHeader>
+
+              <MapPin
+                className="text-emerald-400"
+              />
+
+              <CardTitle>
+
+                Local
+
+              </CardTitle>
+
+            </CardHeader>
 
 
-        <div
+            <CardContent>
 
-          className="
-          rounded-2xl
-          border
-          border-white/10
-          bg-white/5
-          p-6
-          text-slate-300
-          backdrop-blur-xl
-          "
+              <p
+                className="
+                text-xl
+                font-bold
+                text-emerald-400
+                "
+              >
 
-        >
+                Associação da Polícia
 
-          Nenhuma reserva personalizada.
+              </p>
+
+
+              <p
+                className="
+                mt-2
+                text-slate-400
+                "
+              >
+
+                campo fixo
+
+              </p>
+
+            </CardContent>
+
+          </Card>
 
 
         </div>
 
 
+        <Button
+          size="lg"
+          onClick={() => setDialogOpen(true)}
+          className="
+          bg-emerald-500
+          font-bold
+          text-black
+          "
+        >
 
-      </div>
+          <Plus className="mr-2" />
 
+          Agendar novo jogo
 
-
-
-
-
-
-
-
-      <NewGameDialog
-
-        teams={teams}
-
-        games={games}
-
-        open={dialogOpen}
-
-        onOpenChange={(open) => {
+        </Button>
 
 
-          setDialogOpen(open);
+        <NewGameDialog
 
+          teams={teams.map((team) => team.name)}
 
+          games={games}
 
-          if (!open) {
+          open={dialogOpen}
 
+          onOpenChange={setDialogOpen}
 
-            setEditingGame(null);
+          showTrigger={false}
 
-
-          }
-
-
-        }}
-
-
-        showTrigger={false}
-
-
-        initialDate={
-
-          editingGame
-
-            ? editingGame.date
-
-            : formatDate(selectedDate)
-
-        }
-
-
-        initialTime={
-
-          editingGame
-
-            ? editingGame.time
-
-            : selectedTime
-
-        }
-
-
-        editingGame={editingGame}
-
-
-        onCreate={(game) => {
-
-
-          if (editingGame) {
-
-
-            updateGame(
-
-              editingGame.id,
-
-              game
-
-            );
-
-
-          } else {
-
+          onCreate={(game) => {
 
             addGame(game);
 
+            setDialogOpen(false);
 
-          }
+          }}
 
-
-        }}
-
-
-      />
+        />
 
 
+        <Card
+          className="
+          border-white/10
+          bg-white/5
+          text-white
+          backdrop-blur-xl
+          "
+        >
+
+          <CardHeader>
+
+            <div
+              className="
+              flex
+              items-center
+              gap-3
+              "
+            >
+
+              <Trophy
+                className="text-emerald-400"
+              />
+
+              <CardTitle>
+
+                Próximas Partidas
+
+              </CardTitle>
+
+            </div>
+
+          </CardHeader>
 
 
+          <CardContent>
+
+            {nextGames.length > 0 ? (
+
+              <div className="space-y-4">
+
+                {nextGames.map((game) => (
+
+                  <div
+                    key={game.id}
+                    className="
+                    rounded-2xl
+                    border
+                    border-white/10
+                    bg-black/20
+                    p-6
+                    text-center
+                    "
+                  >
+
+                    <h2
+                      className="
+                      text-2xl
+                      font-bold
+                      text-white
+                      "
+                    >
+
+                      {game.team}
+
+                      <span
+                        className="
+                        mx-4
+                        text-emerald-400
+                        "
+                      >
+
+                        X
+
+                      </span>
+
+                      {game.opponent}
+
+                    </h2>
 
 
+                    <div
+                      className="
+                      mt-4
+                      space-y-2
+                      text-slate-300
+                      "
+                    >
+
+                      <p>
+
+                        🕒 {formatDate(game.date)} às {game.time}
+
+                      </p>
 
 
-      <DeleteGameDialog
+                      <p>
 
-        open={!!deletingGame}
+                        🏟 {game.field}
 
-        onOpenChange={(open) => {
+                      </p>
 
-
-          if (!open) {
-
-
-            setDeletingGame(null);
+                    </div>
 
 
-          }
+                    <Badge
+                      className="
+                      mt-4
+                      bg-emerald-500
+                      text-black
+                      "
+                    >
+
+                      {game.status}
+
+                    </Badge>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            ) : (
+
+              <p
+                className="
+                text-center
+                text-slate-400
+                "
+              >
+
+                Nenhum jogo agendado.
+
+              </p>
+
+            )}
+
+          </CardContent>
+
+        </Card>
 
 
-        }}
+      </div>
 
-        teams={
-
-          deletingGame
-
-            ? `${deletingGame.team} x ${deletingGame.opponent}`
-
-            : ""
-
-        }
-
-
-        onConfirm={() => {
-
-
-          if (deletingGame) {
-
-
-            removeGame(
-
-              deletingGame.id
-
-            );
-
-
-            setDeletingGame(null);
-
-
-          }
-
-
-        }}
-
-
-      />
-
-
-
-
-
-
-
-    </div>
-
+    </main>
 
   );
 

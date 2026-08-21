@@ -4,8 +4,8 @@ import {
   CalendarDays,
   MapPin,
   Plus,
-  Users,
   Trophy,
+  Users,
 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
@@ -18,458 +18,447 @@ import {
 } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
-
 import { Button } from "@/components/ui/button";
 
 import { useGames } from "@/context/GamesContext";
 import { useTeams } from "@/context/TeamsContext";
 
 
-
-
-
 export default function DashboardPage() {
-
-
   const router = useRouter();
 
-
-  const {
-    games,
-  } = useGames();
+  const { games } = useGames();
+  const { teams } = useTeams();
 
 
+  const teamsCount = teams.length;
 
-  const {
-    teams,
-  } = useTeams();
-
+  const now = new Date();
 
 
-  const teamsCount =
-    teams.length;
+  const futureGames = [...games]
+    .filter((game) => {
+      const gameDate = new Date(
+        `${game.date}T${game.time}`
+      );
+
+      return gameDate >= now;
+    })
+    .sort((a, b) => {
+      const dataA = new Date(
+        `${a.date}T${a.time}`
+      );
+
+      const dataB = new Date(
+        `${b.date}T${b.time}`
+      );
+
+      return (
+        dataA.getTime() -
+        dataB.getTime()
+      );
+    });
 
 
+  const nextGames =
+    futureGames.length > 0
+      ? futureGames.filter(
+          (game) =>
+            game.date === futureGames[0].date
+        )
+      : [];
 
 
+  function formatDate(date: string) {
+    const formatted =
+      new Date(
+        `${date}T00:00:00`
+      ).toLocaleDateString(
+        "pt-BR",
+        {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        }
+      );
 
-  const sortedGames = [...games].sort((a, b) => {
-  const dataA = new Date(`${a.date}T${a.time}`);
-  const dataB = new Date(`${b.date}T${b.time}`);
 
-  return dataA.getTime() - dataB.getTime();
-});
-
-
-const nextGames =
-  sortedGames.length > 0
-    ? sortedGames.filter(
-        (game) =>
-          game.date === sortedGames[0].date
-      )
-    : [];
-
-    function formatDate(date: string) {
-  return new Date(`${date}T00:00:00`).toLocaleDateString("pt-BR");
-}
-
-  function novoJogo() {
-
-    router.push("/jogos");
-
+    return (
+      formatted.charAt(0).toUpperCase() +
+      formatted.slice(1)
+    );
   }
 
 
-
-
-
+  function novoJogo() {
+    router.push("/jogos");
+  }
 
 
   return (
-
-
-    <main className="
-      min-h-screen
-      bg-gradient-to-br
-      from-emerald-950
-      via-slate-950
-      to-blue-950
-      p-6
-    ">
-
-
-      <div className="space-y-8">
-
-
-
-        <div>
-
-          <h1 className="text-4xl font-bold text-white">
-
-            Olá!
-
-          </h1>
-
-
-          <p className="mt-2 text-slate-300">
-
-            Bem-vindo ao painel de controle do Jogaê.
-
-          </p>
-
-
-        </div>
-
-
-
-
-
-
-        <div className="grid gap-6 md:grid-cols-3">
-
-
-
-
-
-          <Card className="
-            border-white/10
-            bg-white/5
-            text-white
-            backdrop-blur-xl
-          ">
-
-
-            <CardHeader>
-
-              <CalendarDays className="text-emerald-400"/>
-
-
-              <CardTitle>
-
-                Jogos
-
-              </CardTitle>
-
-
-            </CardHeader>
-
-
-
-            <CardContent>
-
-
-              <p className="text-5xl font-bold text-emerald-400">
-
-                {games.length}
-
-              </p>
-
-
-              <p className="mt-2 text-slate-400">
-
-                jogos confirmados
-
-              </p>
-
-
-            </CardContent>
-
-
-          </Card>
-
-
-
-
-
-
-
-
-
-          <Card className="
-            border-white/10
-            bg-white/5
-            text-white
-            backdrop-blur-xl
-          ">
-
-
-            <CardHeader>
-
-
-              <Users className="text-emerald-400"/>
-
-
-              <CardTitle>
-
-                Meus times
-
-              </CardTitle>
-
-
-            </CardHeader>
-
-
-
-
-            <CardContent>
-
-
-              <p className="text-5xl font-bold text-emerald-400">
-
-                {teamsCount}
-
-              </p>
-
-
-              <p className="mt-2 text-slate-400">
-
-                times cadastrados
-
-              </p>
-
-
-            </CardContent>
-
-
-
-          </Card>
-
-
-
-
-
-
-
-
-
-          <Card className="
-            border-white/10
-            bg-white/5
-            text-white
-            backdrop-blur-xl
-          ">
-
-
-
-            <CardHeader>
-
-
-              <MapPin className="text-emerald-400"/>
-
-
-              <CardTitle>
-
-                Local
-
-              </CardTitle>
-
-
-            </CardHeader>
-
-
-
-
-
-            <CardContent>
-
-
-              <p className="text-xl font-bold text-emerald-400">
-
-                Associação da Polícia
-
-              </p>
-
-
-              <p className="mt-2 text-slate-400">
-
-                campo fixo
-
-              </p>
-
-
-            </CardContent>
-
-
-          </Card>
-
-
-
-
-
-        </div>
-
-
-
-
-
-
-
-        <Button
-
-          size="lg"
-
-          onClick={novoJogo}
-
+    <main
+      className="
+        min-h-screen
+        bg-gradient-to-br
+        from-emerald-950
+        via-slate-950
+        to-blue-950
+        px-6
+        pb-10
+        pt-10
+        md:pt-12
+      "
+    >
+
+      <div
+        className="
+          mx-auto
+          max-w-7xl
+          space-y-10
+        "
+      >
+
+
+        {/* CABEÇALHO */}
+        <div
           className="
-            bg-emerald-500
-            font-bold
-            text-black
+            flex
+            flex-col
+            gap-6
+            lg:flex-row
+            lg:items-end
+            lg:justify-between
           "
-
         >
 
-          <Plus className="mr-2"/>
+          <div>
 
-          Agendar novo jogo
-
-
-        </Button>
-
-
-
-
-
-
-
-
-
-        <Card className="
-          border-white/10
-          bg-white/5
-          text-white
-          backdrop-blur-xl
-        ">
+            <p
+              className="
+                mb-3
+                text-xs
+                font-semibold
+                uppercase
+                tracking-[0.18em]
+                text-emerald-400
+              "
+            >
+              Painel de controle
+            </p>
 
 
+            <h1
+              className="
+                text-4xl
+                font-bold
+                tracking-tight
+                text-white
+                md:text-5xl
+              "
+            >
+              Olá!
+            </h1>
+
+
+            <p
+              className="
+                mt-3
+                max-w-xl
+                text-base
+                leading-relaxed
+                text-slate-300
+              "
+            >
+              Bem-vindo ao painel de controle do Jogaê.
+            </p>
+
+          </div>
+
+
+          <Button
+            size="lg"
+            onClick={novoJogo}
+            className="
+              group
+              w-full
+              bg-emerald-500
+              font-bold
+              text-black
+              shadow-lg
+              shadow-emerald-500/10
+              transition-all
+              hover:-translate-y-0.5
+              hover:bg-emerald-400
+              lg:w-auto
+            "
+          >
+
+            <Plus
+              size={20}
+              className="
+                mr-2
+                transition-transform
+                group-hover:rotate-90
+              "
+            />
+
+            Agendar novo jogo
+
+          </Button>
+
+
+        </div>
+
+
+
+        {/* CARDS */}
+        <div
+          className="
+            grid
+            gap-5
+            md:grid-cols-3
+          "
+        >
+
+
+          <Card
+            onClick={() =>
+              router.push("/jogos")
+            }
+            className="
+              cursor-pointer
+              border-white/10
+              bg-white/5
+              text-white
+            "
+          >
+
+            <CardHeader>
+
+              <CardTitle>
+                Jogos
+              </CardTitle>
+
+            </CardHeader>
+
+
+            <CardContent>
+
+              <p
+                className="
+                  text-5xl
+                  font-bold
+                "
+              >
+                {games.length}
+              </p>
+
+              <p className="mt-3 text-slate-400">
+                Jogos cadastrados
+              </p>
+
+            </CardContent>
+
+
+          </Card>
+
+
+
+          <Card
+            onClick={() =>
+              router.push("/times")
+            }
+            className="
+              cursor-pointer
+              border-white/10
+              bg-white/5
+              text-white
+            "
+          >
+
+            <CardHeader>
+
+              <CardTitle>
+                Meus times
+              </CardTitle>
+
+            </CardHeader>
+
+
+            <CardContent>
+
+              <p
+                className="
+                  text-5xl
+                  font-bold
+                "
+              >
+                {teamsCount}
+              </p>
+
+              <p className="mt-3 text-slate-400">
+                Times cadastrados
+              </p>
+
+            </CardContent>
+
+
+          </Card>
+
+
+
+
+          <Card
+            className="
+              border-white/10
+              bg-white/5
+              text-white
+            "
+          >
+
+            <CardHeader>
+
+              <CardTitle>
+                Local
+              </CardTitle>
+
+            </CardHeader>
+
+
+            <CardContent>
+
+              <p className="text-xl font-bold">
+                Associação da Polícia
+              </p>
+
+              <p className="mt-3 text-slate-400">
+                Campo fixo
+              </p>
+
+            </CardContent>
+
+          </Card>
+
+
+        </div>
+
+
+
+        {/* PRÓXIMOS JOGOS */}
+        <Card
+          className="
+            border-white/10
+            bg-white/5
+            text-white
+          "
+        >
 
           <CardHeader>
 
-
-            <div className="flex items-center gap-3">
-
-
-              <Trophy className="text-emerald-400"/>
-
-
-              <CardTitle>
-
-                Próximas Partidas
-
-              </CardTitle>
-
-
-            </div>
-
+            <CardTitle>
+              Próximas Partidas
+            </CardTitle>
 
           </CardHeader>
 
 
 
-
-
-
-
           <CardContent>
-
-
-
-
 
             {nextGames.length > 0 ? (
 
-  <div className="space-y-4">
+              <div
+                className="
+                  grid
+                  gap-4
+                  md:grid-cols-2
+                "
+              >
 
-    {nextGames.map((game) => (
+                {nextGames.map((game)=>(
 
-      <div
-        key={game.id}
-        className="
-          rounded-2xl
-          border
-          border-white/10
-          bg-black/20
-          p-6
-          text-center
-        "
-      >
+                  <div
+                    key={game.id}
+                    className="
+                      rounded-2xl
+                      border
+                      border-white/10
+                      bg-black/20
+                      p-5
+                    "
+                  >
 
-        <h2 className="text-2xl font-bold text-white">
-
-          {game.team}
-
-          <span className="mx-4 text-emerald-400">
-            X
-          </span>
-
-          {game.opponent}
-
-        </h2>
+                    <Badge>
+                      {game.status}
+                    </Badge>
 
 
-        <div className="mt-4 space-y-2 text-slate-300">
+                    <h2
+                      className="
+                        mt-5
+                        text-xl
+                        font-bold
+                        text-center
+                      "
+                    >
 
-          <p>
-            🕒 {formatDate(game.date)} às {game.time}
-          </p>
+                      {game.team}
 
+                      <span className="mx-2 text-emerald-400">
+                        X
+                      </span>
 
-          <p>
-            🏟 {game.field}
-          </p>
+                      {game.opponent}
 
-
-        </div>
-
-
-        <Badge
-          className="
-            mt-4
-            bg-emerald-500
-            text-black
-          "
-        >
-
-          {game.status}
-
-        </Badge>
+                    </h2>
 
 
-      </div>
+                    <div className="mt-5 space-y-3">
 
-    ))}
-
-  </div>
-
-
-) : (
-
-  <p className="text-center text-slate-400">
-    Nenhum jogo agendado.
-  </p>
-
-)}
+                      <p>
+                        📅 {formatDate(game.date)}
+                      </p>
 
 
+                      <p>
+                        🕒 {game.time}
+                      </p>
+
+
+                      <p>
+                        📍 {game.field}
+                      </p>
+
+
+                    </div>
+
+
+                  </div>
+
+                ))}
+
+
+              </div>
+
+
+            ) : (
+
+              <p className="text-slate-400">
+                Nenhum jogo futuro agendado.
+              </p>
+
+            )}
 
 
           </CardContent>
 
 
-
-
         </Card>
-
-
-
 
 
       </div>
 
 
     </main>
-
-
   );
-
-
 }
