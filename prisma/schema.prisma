@@ -16,6 +16,10 @@ model Game {
   team      String
   opponent  String
   status    String
+
+  teamScore     Int?
+  opponentScore Int?
+
   createdAt DateTime @default(now())
 }
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-
 // Buscar jogos
 export async function GET() {
   try {
@@ -12,7 +11,6 @@ export async function GET() {
     });
 
     return NextResponse.json(games);
-
   } catch (error) {
     console.error("ERRO AO BUSCAR JOGOS:", error);
 
@@ -28,11 +26,8 @@ export async function GET() {
   }
 }
 
-
 // Criar jogo
-export async function POST(
-  request: NextRequest
-) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
@@ -44,11 +39,25 @@ export async function POST(
         team: body.team,
         opponent: body.opponent,
         status: body.status,
+
+        // Placar
+        teamScore:
+          body.teamScore !== undefined &&
+          body.teamScore !== null &&
+          body.teamScore !== ""
+            ? Number(body.teamScore)
+            : null,
+
+        opponentScore:
+          body.opponentScore !== undefined &&
+          body.opponentScore !== null &&
+          body.opponentScore !== ""
+            ? Number(body.opponentScore)
+            : null,
       },
     });
 
     return NextResponse.json(game);
-
   } catch (error) {
     console.error("ERRO AO CRIAR JOGO:", error);
 
@@ -64,11 +73,8 @@ export async function POST(
   }
 }
 
-
 // Editar jogo
-export async function PUT(
-  request: NextRequest
-) {
+export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
 
@@ -84,11 +90,25 @@ export async function PUT(
         team: body.team,
         opponent: body.opponent,
         status: body.status,
+
+        // Placar
+        teamScore:
+          body.teamScore !== undefined &&
+          body.teamScore !== null &&
+          body.teamScore !== ""
+            ? Number(body.teamScore)
+            : null,
+
+        opponentScore:
+          body.opponentScore !== undefined &&
+          body.opponentScore !== null &&
+          body.opponentScore !== ""
+            ? Number(body.opponentScore)
+            : null,
       },
     });
 
     return NextResponse.json(game);
-
   } catch (error) {
     console.error("ERRO AO EDITAR JOGO:", error);
 
@@ -104,11 +124,8 @@ export async function PUT(
   }
 }
 
-
 // Excluir jogo
-export async function DELETE(
-  request: NextRequest
-) {
+export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json();
 
@@ -121,7 +138,6 @@ export async function DELETE(
     return NextResponse.json({
       success: true,
     });
-
   } catch (error) {
     console.error("ERRO AO EXCLUIR JOGO:", error);
 
