@@ -7,6 +7,7 @@ import {
   UserRound,
   Trash2,
   Pencil,
+  Trophy,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -20,8 +21,17 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 import { NewGameDialog } from "@/components/jogos/NewGameDialog";
-import { useGames } from "@/context/GamesContext";
+import { useGames, Game } from "@/context/GamesContext";
 
 import {
   Select,
@@ -30,16 +40,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface Game {
-  id: string;
-  date: string;
-  time: string;
-  field: string;
-  team: string;
-  opponent: string;
-  status: string;
-}
 
 interface Team {
   id: string;
@@ -69,8 +69,20 @@ export default function JogosPage() {
   const [editingGame, setEditingGame] =
     useState<Game | null>(null);
 
+  const [scoreGame, setScoreGame] =
+    useState<Game | null>(null);
+
   const [openEdit, setOpenEdit] =
     useState(false);
+
+  const [openScore, setOpenScore] =
+    useState(false);
+
+  const [teamScore, setTeamScore] =
+    useState("");
+
+  const [opponentScore, setOpponentScore] =
+    useState("");
 
   const [selectedTeam, setSelectedTeam] =
     useState("todos");
@@ -106,12 +118,8 @@ export default function JogosPage() {
         const data: Team[] =
           await response.json();
 
-        // Guarda os times completos
-        // para termos acesso aos escudos
         setTeamData(data);
 
-        // Mantém a lista de nomes
-        // usada pelos filtros e pelo NewGameDialog
         setTeams(
           data.map(
             (team) => team.name
@@ -156,6 +164,121 @@ export default function JogosPage() {
     return game.status;
   }
 
+  function getResult(
+    game: Game
+  ) {
+    if (
+      game.teamScore === null ||
+      game.teamScore === undefined ||
+      game.opponentScore === null ||
+      game.opponentScore === undefined
+    ) {
+      return null;
+    }
+
+    if (
+      game.teamScore >
+      game.opponentScore
+    ) {
+      return "Vitória";
+    }
+
+    if (
+      game.teamScore <
+      game.opponentScore
+    ) {
+      return "Derrota";
+    }
+
+    return "Empate";
+  }
+
+  function getResultClasses(
+    game: Game
+  ) {
+    const result = getResult(game);
+
+    if (result === "Vitória") {
+      return "border-emerald-400/20 bg-emerald-400/10 text-emerald-300";
+    }
+
+    if (result === "Derrota") {
+      return "border-red-400/20 bg-red-400/10 text-red-300";
+    }
+
+    if (result === "Empate") {
+      return "border-amber-400/20 bg-amber-400/10 text-amber-300";
+    }
+
+    return "border-white/10 bg-white/[0.05] text-slate-400";
+  }
+
+  function openScoreDialog(
+    game: Game
+  ) {
+    setScoreGame(game);
+
+    setTeamScore(
+      game.teamScore !== null &&
+        game.teamScore !== undefined
+        ? String(game.teamScore)
+        : ""
+    );
+
+    setOpponentScore(
+      game.opponentScore !== null &&
+        game.opponentScore !== undefined
+        ? String(game.opponentScore)
+        : ""
+    );
+
+    setOpenScore(true);
+  }
+
+  async function saveScore() {
+    if (!scoreGame) {
+      return;
+    }
+
+    if (
+      teamScore === "" ||
+      opponentScore === ""
+    ) {
+      return;
+    }
+
+    const parsedTeamScore =
+      Number(teamScore);
+
+    const parsedOpponentScore =
+      Number(opponentScore);
+
+    if (
+      Number.isNaN(parsedTeamScore) ||
+      Number.isNaN(parsedOpponentScore) ||
+      parsedTeamScore < 0 ||
+      parsedOpponentScore < 0
+    ) {
+      return;
+    }
+
+    await updateGame(
+      scoreGame.id,
+      {
+        ...scoreGame,
+        teamScore:
+          parsedTeamScore,
+        opponentScore:
+          parsedOpponentScore,
+      }
+    );
+
+    setOpenScore(false);
+    setScoreGame(null);
+    setTeamScore("");
+    setOpponentScore("");
+  }
+
   const filteredGames = games
     .filter((game) => {
       if (selectedTeam === "todos") {
@@ -171,11 +294,15 @@ export default function JogosPage() {
       const finished =
         isGameFinished(game);
 
-      if (statusFilter === "encerrados") {
+      if (
+        statusFilter === "encerrados"
+      ) {
         return finished;
       }
 
-      if (statusFilter === "proximos") {
+      if (
+        statusFilter === "proximos"
+      ) {
         return !finished;
       }
 
@@ -196,7 +323,9 @@ export default function JogosPage() {
       );
     });
 
-  function formatGameDate(date: string) {
+  function formatGameDate(
+    date: string
+  ) {
     const formatted = new Date(
       `${date}T00:00:00`
     ).toLocaleDateString(
@@ -491,6 +620,9 @@ export default function JogosPage() {
             const displayStatus =
               getDisplayStatus(game);
 
+            const result =
+              getResult(game);
+
             const teamShield =
               getTeamShield(
                 game.team
@@ -522,13 +654,13 @@ export default function JogosPage() {
                   hover:shadow-black/20
                   ${
                     finished
-                      ? "opacity-80"
+                      ? "opacity-90"
                       : ""
                   }
                 `}
               >
 
-                {/* CABEÇALHO DO CARD */}
+                {/* CABEÇALHO */}
 
                 <CardHeader
                   className="
@@ -545,7 +677,7 @@ export default function JogosPage() {
                     "
                   >
 
-                    {/* TIMES + ESCUDOS */}
+                    {/* TIMES */}
 
                     <div
                       className="
@@ -558,7 +690,7 @@ export default function JogosPage() {
                       "
                     >
 
-                      {/* TIME DA CASA */}
+                      {/* TIME */}
 
                       <div
                         className="
@@ -619,18 +751,80 @@ export default function JogosPage() {
                         </span>
                       </div>
 
-                      {/* X */}
+                      {/* PLACAR / X */}
 
-                      <span
+                      <div
                         className="
+                          flex
                           shrink-0
-                          text-lg
-                          font-bold
-                          text-emerald-400
+                          flex-col
+                          items-center
+                          justify-center
                         "
                       >
-                        ×
-                      </span>
+                        {finished &&
+                        game.teamScore !== null &&
+                        game.teamScore !== undefined &&
+                        game.opponentScore !== null &&
+                        game.opponentScore !== undefined ? (
+                          <div
+                            className="
+                              flex
+                              flex-col
+                              items-center
+                              gap-1
+                            "
+                          >
+                            <div
+                              className="
+                                text-3xl
+                                font-black
+                                tracking-tight
+                                text-white
+                              "
+                            >
+                              {game.teamScore}
+                              <span
+                                className="
+                                  mx-1.5
+                                  text-lg
+                                  font-medium
+                                  text-slate-500
+                                "
+                              >
+                                ×
+                              </span>
+                              {game.opponentScore}
+                            </div>
+
+                            {result && (
+                              <span
+                                className={`
+                                  rounded-full
+                                  border
+                                  px-2.5
+                                  py-0.5
+                                  text-[10px]
+                                  font-semibold
+                                  ${getResultClasses(game)}
+                                `}
+                              >
+                                {result}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span
+                            className="
+                              text-lg
+                              font-bold
+                              text-emerald-400
+                            "
+                          >
+                            ×
+                          </span>
+                        )}
+                      </div>
 
                       {/* ADVERSÁRIO */}
 
@@ -692,7 +886,6 @@ export default function JogosPage() {
                           {game.opponent}
                         </span>
                       </div>
-
                     </div>
 
                     {/* STATUS */}
@@ -724,7 +917,6 @@ export default function JogosPage() {
                     >
                       {displayStatus}
                     </Badge>
-
                   </div>
                 </CardHeader>
 
@@ -833,6 +1025,115 @@ export default function JogosPage() {
                     </span>
                   </div>
 
+                  {/* RESULTADO */}
+
+                  {finished && (
+                    <div
+                      className="
+                        rounded-xl
+                        border
+                        border-white/10
+                        bg-white/[0.035]
+                        p-4
+                      "
+                    >
+                      {result ? (
+                        <div
+                          className="
+                            flex
+                            items-center
+                            justify-between
+                            gap-3
+                          "
+                        >
+                          <div
+                            className="
+                              flex
+                              items-center
+                              gap-2
+                            "
+                          >
+                            <Trophy
+                              size={17}
+                              className="
+                                text-emerald-400
+                              "
+                            />
+
+                            <span
+                              className="
+                                text-sm
+                                font-medium
+                                text-slate-300
+                              "
+                            >
+                              Resultado
+                            </span>
+                          </div>
+
+                          <span
+                            className={`
+                              rounded-full
+                              border
+                              px-3
+                              py-1
+                              text-xs
+                              font-semibold
+                              ${getResultClasses(game)}
+                            `}
+                          >
+                            {result}
+                          </span>
+                        </div>
+                      ) : (
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            openScoreDialog(
+                              game
+                            )
+                          }
+                          className="
+                            h-10
+                            w-full
+                            rounded-xl
+                            bg-emerald-500
+                            font-semibold
+                            text-slate-950
+                            transition
+                            hover:bg-emerald-400
+                          "
+                        >
+                          Adicionar resultado
+                        </Button>
+                      )}
+
+                      {result && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() =>
+                            openScoreDialog(
+                              game
+                            )
+                          }
+                          className="
+                            mt-2
+                            h-9
+                            w-full
+                            rounded-xl
+                            text-xs
+                            text-slate-400
+                            hover:bg-white/5
+                            hover:text-white
+                          "
+                        >
+                          Editar placar
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
                   {/* AÇÕES */}
 
                   <div
@@ -887,7 +1188,6 @@ export default function JogosPage() {
                       <Trash2 size={16} />
                     </Button>
                   </div>
-
                 </CardContent>
               </Card>
             );
@@ -895,7 +1195,7 @@ export default function JogosPage() {
         )}
       </div>
 
-      {/* EDIÇÃO */}
+      {/* EDIÇÃO DO JOGO */}
 
       {editingGame && (
         <NewGameDialog
@@ -921,6 +1221,222 @@ export default function JogosPage() {
         />
       )}
 
+      {/* DIALOG DE PLACAR */}
+
+      <Dialog
+        open={openScore}
+        onOpenChange={(open) => {
+          setOpenScore(open);
+
+          if (!open) {
+            setScoreGame(null);
+            setTeamScore("");
+            setOpponentScore("");
+          }
+        }}
+      >
+        <DialogContent
+          className="
+            rounded-2xl
+            border-white/10
+            bg-slate-950
+            text-white
+            shadow-2xl
+          "
+        >
+          <DialogHeader>
+            <DialogTitle
+              className="
+                text-xl
+                font-bold
+                text-white
+              "
+            >
+              Registrar resultado
+            </DialogTitle>
+          </DialogHeader>
+
+          {scoreGame && (
+            <div className="space-y-6">
+
+              {/* TIMES */}
+
+              <div
+                className="
+                  grid
+                  grid-cols-[1fr_auto_1fr]
+                  items-center
+                  gap-4
+                "
+              >
+
+                {/* SEU TIME */}
+
+                <div
+                  className="
+                    flex
+                    flex-col
+                    items-center
+                    gap-3
+                    text-center
+                  "
+                >
+                  {getTeamShield(
+                    scoreGame.team
+                  ) ? (
+                    <img
+                      src={
+                        getTeamShield(
+                          scoreGame.team
+                        ) || ""
+                      }
+                      alt={`Escudo do ${scoreGame.team}`}
+                      className="
+                        h-16
+                        w-16
+                        object-contain
+                      "
+                    />
+                  ) : (
+                    <span className="text-3xl">
+                      ⚽
+                    </span>
+                  )}
+
+                  <span
+                    className="
+                      max-w-full
+                      text-sm
+                      font-semibold
+                      text-white
+                    "
+                  >
+                    {scoreGame.team}
+                  </span>
+
+                  <Input
+                    type="number"
+                    min="0"
+                    value={teamScore}
+                    onChange={(e) =>
+                      setTeamScore(
+                        e.target.value
+                      )
+                    }
+                    className="
+                      h-14
+                      rounded-xl
+                      border-white/10
+                      bg-white/5
+                      text-center
+                      text-2xl
+                      font-bold
+                      text-white
+                    "
+                  />
+                </div>
+
+                {/* X */}
+
+                <span
+                  className="
+                    text-xl
+                    font-bold
+                    text-slate-500
+                  "
+                >
+                  ×
+                </span>
+
+                {/* ADVERSÁRIO */}
+
+                <div
+                  className="
+                    flex
+                    flex-col
+                    items-center
+                    gap-3
+                    text-center
+                  "
+                >
+                  {getTeamShield(
+                    scoreGame.opponent
+                  ) ? (
+                    <img
+                      src={
+                        getTeamShield(
+                          scoreGame.opponent
+                        ) || ""
+                      }
+                      alt={`Escudo do ${scoreGame.opponent}`}
+                      className="
+                        h-16
+                        w-16
+                        object-contain
+                      "
+                    />
+                  ) : (
+                    <span className="text-3xl">
+                      ⚽
+                    </span>
+                  )}
+
+                  <span
+                    className="
+                      max-w-full
+                      text-sm
+                      font-semibold
+                      text-white
+                    "
+                  >
+                    {scoreGame.opponent}
+                  </span>
+
+                  <Input
+                    type="number"
+                    min="0"
+                    value={opponentScore}
+                    onChange={(e) =>
+                      setOpponentScore(
+                        e.target.value
+                      )
+                    }
+                    className="
+                      h-14
+                      rounded-xl
+                      border-white/10
+                      bg-white/5
+                      text-center
+                      text-2xl
+                      font-bold
+                      text-white
+                    "
+                  />
+                </div>
+              </div>
+
+              {/* BOTÃO */}
+
+              <Button
+                type="button"
+                onClick={saveScore}
+                className="
+                  h-11
+                  w-full
+                  rounded-xl
+                  bg-emerald-500
+                  font-semibold
+                  text-slate-950
+                  transition
+                  hover:bg-emerald-400
+                "
+              >
+                Salvar resultado
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
