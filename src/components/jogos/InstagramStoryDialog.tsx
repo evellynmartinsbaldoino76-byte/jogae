@@ -75,7 +75,11 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
       setGenerating(true);
       try {
         await document.fonts?.ready;
-        await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => resolve());
+          });
+        });
         const image = await toPng(artworkRef.current, {
           width: ART_SIZE.width,
           height: ART_SIZE.height,
