@@ -7,7 +7,7 @@ import {
   UserRound,
   Trash2,
   Pencil,
-  Trophy,
+  Share2,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -16,7 +16,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +30,8 @@ import {
 } from "@/components/ui/dialog";
 
 import { NewGameDialog } from "@/components/jogos/NewGameDialog";
+import { InstagramStoryDialog } from "@/components/jogos/InstagramStoryDialog";
+
 import { useGames, Game } from "@/context/GamesContext";
 
 import {
@@ -60,11 +61,8 @@ export default function JogosPage() {
     updateGame,
   } = useGames();
 
-  const [teams, setTeams] =
-    useState<string[]>([]);
-
-  const [teamData, setTeamData] =
-    useState<Team[]>([]);
+  const [teams, setTeams] = useState<string[]>([]);
+  const [teamData, setTeamData] = useState<Team[]>([]);
 
   const [editingGame, setEditingGame] =
     useState<Game | null>(null);
@@ -72,17 +70,15 @@ export default function JogosPage() {
   const [scoreGame, setScoreGame] =
     useState<Game | null>(null);
 
-  const [openEdit, setOpenEdit] =
-    useState(false);
+  const [shareGame, setShareGame] =
+    useState<Game | null>(null);
 
-  const [openScore, setOpenScore] =
-    useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openScore, setOpenScore] = useState(false);
+  const [openShare, setOpenShare] = useState(false);
 
-  const [teamScore, setTeamScore] =
-    useState("");
-
-  const [opponentScore, setOpponentScore] =
-    useState("");
+  const [teamScore, setTeamScore] = useState("");
+  const [opponentScore, setOpponentScore] = useState("");
 
   const [selectedTeam, setSelectedTeam] =
     useState("todos");
@@ -93,6 +89,10 @@ export default function JogosPage() {
   const [currentTime, setCurrentTime] =
     useState(new Date());
 
+  /*
+   * Atualiza o horário usado para verificar
+   * se um jogo já passou.
+   */
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
@@ -103,11 +103,13 @@ export default function JogosPage() {
     };
   }, []);
 
+  /*
+   * Carrega os times cadastrados.
+   */
   useEffect(() => {
     async function loadTeams() {
       try {
-        const response =
-          await fetch("/api/teams");
+        const response = await fetch("/api/teams");
 
         if (!response.ok) {
           throw new Error(
@@ -115,15 +117,12 @@ export default function JogosPage() {
           );
         }
 
-        const data: Team[] =
-          await response.json();
+        const data: Team[] = await response.json();
 
         setTeamData(data);
 
         setTeams(
-          data.map(
-            (team) => team.name
-          )
+          data.map((team) => team.name)
         );
       } catch (error) {
         console.error(
@@ -136,9 +135,10 @@ export default function JogosPage() {
     loadTeams();
   }, []);
 
-  function getTeamShield(
-    teamName: string
-  ) {
+  /*
+   * Procura o escudo pelo nome do time.
+   */
+  function getTeamShield(teamName: string) {
     const team = teamData.find(
       (item) =>
         item.name.toLowerCase() ===
@@ -148,6 +148,9 @@ export default function JogosPage() {
     return team?.shieldUrl || null;
   }
 
+  /*
+   * Verifica se o jogo já passou.
+   */
   function isGameFinished(game: Game) {
     const gameDate = new Date(
       `${game.date}T${game.time}`
@@ -156,6 +159,12 @@ export default function JogosPage() {
     return gameDate < currentTime;
   }
 
+  /*
+   * Status exibido no card.
+   *
+   * O Jogaê não considera nenhum time
+   * como "time do sistema".
+   */
   function getDisplayStatus(game: Game) {
     if (isGameFinished(game)) {
       return "Encerrado";
@@ -164,58 +173,11 @@ export default function JogosPage() {
     return game.status;
   }
 
-  function getResult(
-    game: Game
-  ) {
-    if (
-      game.teamScore === null ||
-      game.teamScore === undefined ||
-      game.opponentScore === null ||
-      game.opponentScore === undefined
-    ) {
-      return null;
-    }
-
-    if (
-      game.teamScore >
-      game.opponentScore
-    ) {
-      return "Vitória";
-    }
-
-    if (
-      game.teamScore <
-      game.opponentScore
-    ) {
-      return "Derrota";
-    }
-
-    return "Empate";
-  }
-
-  function getResultClasses(
-    game: Game
-  ) {
-    const result = getResult(game);
-
-    if (result === "Vitória") {
-      return "border-emerald-400/20 bg-emerald-400/10 text-emerald-300";
-    }
-
-    if (result === "Derrota") {
-      return "border-red-400/20 bg-red-400/10 text-red-300";
-    }
-
-    if (result === "Empate") {
-      return "border-amber-400/20 bg-amber-400/10 text-amber-300";
-    }
-
-    return "border-white/10 bg-white/[0.05] text-slate-400";
-  }
-
-  function openScoreDialog(
-    game: Game
-  ) {
+  /*
+   * Abre o diálogo para registrar/editar
+   * o placar.
+   */
+  function openScoreDialog(game: Game) {
     setScoreGame(game);
 
     setTeamScore(
@@ -235,6 +197,11 @@ export default function JogosPage() {
     setOpenScore(true);
   }
 
+  /*
+   * Salva o placar.
+   *
+   * Não calcula Vitória/Derrota/Empate.
+   */
   async function saveScore() {
     if (!scoreGame) {
       return;
@@ -247,9 +214,7 @@ export default function JogosPage() {
       return;
     }
 
-    const parsedTeamScore =
-      Number(teamScore);
-
+    const parsedTeamScore = Number(teamScore);
     const parsedOpponentScore =
       Number(opponentScore);
 
@@ -266,10 +231,8 @@ export default function JogosPage() {
       scoreGame.id,
       {
         ...scoreGame,
-        teamScore:
-          parsedTeamScore,
-        opponentScore:
-          parsedOpponentScore,
+        teamScore: parsedTeamScore,
+        opponentScore: parsedOpponentScore,
       }
     );
 
@@ -279,6 +242,17 @@ export default function JogosPage() {
     setOpponentScore("");
   }
 
+  /*
+   * Abre o compartilhamento.
+   */
+  function openShareDialog(game: Game) {
+    setShareGame(game);
+    setOpenShare(true);
+  }
+
+  /*
+   * Filtra e ordena os jogos.
+   */
   const filteredGames = games
     .filter((game) => {
       if (selectedTeam === "todos") {
@@ -291,18 +265,13 @@ export default function JogosPage() {
       );
     })
     .filter((game) => {
-      const finished =
-        isGameFinished(game);
+      const finished = isGameFinished(game);
 
-      if (
-        statusFilter === "encerrados"
-      ) {
+      if (statusFilter === "encerrados") {
         return finished;
       }
 
-      if (
-        statusFilter === "proximos"
-      ) {
+      if (statusFilter === "proximos") {
         return !finished;
       }
 
@@ -318,24 +287,21 @@ export default function JogosPage() {
       );
 
       return (
-        dateA.getTime() -
-        dateB.getTime()
+        dateA.getTime() - dateB.getTime()
       );
     });
 
-  function formatGameDate(
-    date: string
-  ) {
+  /*
+   * Formata a data para português.
+   */
+  function formatGameDate(date: string) {
     const formatted = new Date(
       `${date}T00:00:00`
-    ).toLocaleDateString(
-      "pt-BR",
-      {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }
-    );
+    ).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
 
     return (
       formatted.charAt(0).toUpperCase() +
@@ -419,7 +385,7 @@ export default function JogosPage() {
           "
         >
 
-          {/* FILTRO DE STATUS */}
+          {/* STATUS */}
 
           <div
             className="
@@ -501,7 +467,7 @@ export default function JogosPage() {
             </button>
           </div>
 
-          {/* FILTRO DE TIMES */}
+          {/* TIMES */}
 
           <Select
             value={selectedTeam}
@@ -574,7 +540,7 @@ export default function JogosPage() {
         </p>
       </div>
 
-      {/* GRID DE JOGOS */}
+      {/* GRID */}
 
       <div
         className="
@@ -613,25 +579,23 @@ export default function JogosPage() {
         ) : (
 
           filteredGames.map((game) => {
-
             const finished =
               isGameFinished(game);
 
             const displayStatus =
               getDisplayStatus(game);
 
-            const result =
-              getResult(game);
-
             const teamShield =
-              getTeamShield(
-                game.team
-              );
+              getTeamShield(game.team);
 
             const opponentShield =
-              getTeamShield(
-                game.opponent
-              );
+              getTeamShield(game.opponent);
+
+            const hasScore =
+              game.teamScore !== null &&
+              game.teamScore !== undefined &&
+              game.opponentScore !== null &&
+              game.opponentScore !== undefined;
 
             return (
               <Card
@@ -690,7 +654,7 @@ export default function JogosPage() {
                       "
                     >
 
-                      {/* TIME */}
+                      {/* TIME 1 */}
 
                       <div
                         className="
@@ -751,7 +715,7 @@ export default function JogosPage() {
                         </span>
                       </div>
 
-                      {/* PLACAR / X */}
+                      {/* PLACAR */}
 
                       <div
                         className="
@@ -762,56 +726,29 @@ export default function JogosPage() {
                           justify-center
                         "
                       >
-                        {finished &&
-                        game.teamScore !== null &&
-                        game.teamScore !== undefined &&
-                        game.opponentScore !== null &&
-                        game.opponentScore !== undefined ? (
+                        {finished && hasScore ? (
                           <div
                             className="
-                              flex
-                              flex-col
-                              items-center
-                              gap-1
+                              text-3xl
+                              font-black
+                              tracking-tight
+                              text-white
                             "
                           >
-                            <div
+                            {game.teamScore}
+
+                            <span
                               className="
-                                text-3xl
-                                font-black
-                                tracking-tight
-                                text-white
+                                mx-1.5
+                                text-lg
+                                font-medium
+                                text-slate-500
                               "
                             >
-                              {game.teamScore}
-                              <span
-                                className="
-                                  mx-1.5
-                                  text-lg
-                                  font-medium
-                                  text-slate-500
-                                "
-                              >
-                                ×
-                              </span>
-                              {game.opponentScore}
-                            </div>
+                              ×
+                            </span>
 
-                            {result && (
-                              <span
-                                className={`
-                                  rounded-full
-                                  border
-                                  px-2.5
-                                  py-0.5
-                                  text-[10px]
-                                  font-semibold
-                                  ${getResultClasses(game)}
-                                `}
-                              >
-                                {result}
-                              </span>
-                            )}
+                            {game.opponentScore}
                           </div>
                         ) : (
                           <span
@@ -826,7 +763,7 @@ export default function JogosPage() {
                         )}
                       </div>
 
-                      {/* ADVERSÁRIO */}
+                      {/* TIME 2 */}
 
                       <div
                         className="
@@ -1002,7 +939,7 @@ export default function JogosPage() {
                     </span>
                   </div>
 
-                  {/* TIME */}
+                  {/* TIMES */}
 
                   <div
                     className="
@@ -1021,11 +958,12 @@ export default function JogosPage() {
                     />
 
                     <span>
-                      {game.team}
+                      {game.team} ×{" "}
+                      {game.opponent}
                     </span>
                   </div>
 
-                  {/* RESULTADO */}
+                  {/* PLACAR */}
 
                   {finished && (
                     <div
@@ -1037,7 +975,7 @@ export default function JogosPage() {
                         p-4
                       "
                     >
-                      {result ? (
+                      {hasScore ? (
                         <div
                           className="
                             flex
@@ -1046,52 +984,44 @@ export default function JogosPage() {
                             gap-3
                           "
                         >
-                          <div
+                          <span
                             className="
-                              flex
-                              items-center
-                              gap-2
+                              text-sm
+                              font-medium
+                              text-slate-300
                             "
                           >
-                            <Trophy
-                              size={17}
-                              className="
-                                text-emerald-400
-                              "
-                            />
+                            Placar final
+                          </span>
+
+                          <span
+                            className="
+                              text-xl
+                              font-black
+                              text-white
+                            "
+                          >
+                            {game.teamScore}
 
                             <span
                               className="
+                                mx-1.5
                                 text-sm
                                 font-medium
-                                text-slate-300
+                                text-slate-500
                               "
                             >
-                              Resultado
+                              ×
                             </span>
-                          </div>
 
-                          <span
-                            className={`
-                              rounded-full
-                              border
-                              px-3
-                              py-1
-                              text-xs
-                              font-semibold
-                              ${getResultClasses(game)}
-                            `}
-                          >
-                            {result}
+                            {game.opponentScore}
                           </span>
                         </div>
                       ) : (
                         <Button
                           type="button"
                           onClick={() =>
-                            openScoreDialog(
-                              game
-                            )
+                            openScoreDialog(game)
                           }
                           className="
                             h-10
@@ -1104,18 +1034,16 @@ export default function JogosPage() {
                             hover:bg-emerald-400
                           "
                         >
-                          Adicionar resultado
+                          Adicionar placar
                         </Button>
                       )}
 
-                      {result && (
+                      {hasScore && (
                         <Button
                           type="button"
                           variant="ghost"
                           onClick={() =>
-                            openScoreDialog(
-                              game
-                            )
+                            openScoreDialog(game)
                           }
                           className="
                             mt-2
@@ -1147,6 +1075,31 @@ export default function JogosPage() {
                       pt-5
                     "
                   >
+
+                    {/* COMPARTILHAR */}
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Compartilhar jogo"
+                      onClick={() =>
+                        openShareDialog(game)
+                      }
+                      className="
+                        h-9
+                        w-9
+                        rounded-full
+                        text-slate-400
+                        transition
+                        hover:bg-emerald-500/10
+                        hover:text-emerald-400
+                      "
+                    >
+                      <Share2 size={16} />
+                    </Button>
+
+                    {/* EDITAR */}
+
                     <Button
                       variant="ghost"
                       size="icon"
@@ -1167,6 +1120,8 @@ export default function JogosPage() {
                     >
                       <Pencil size={16} />
                     </Button>
+
+                    {/* EXCLUIR */}
 
                     <Button
                       variant="ghost"
@@ -1252,7 +1207,7 @@ export default function JogosPage() {
                 text-white
               "
             >
-              Registrar resultado
+              Registrar placar
             </DialogTitle>
           </DialogHeader>
 
@@ -1270,7 +1225,7 @@ export default function JogosPage() {
                 "
               >
 
-                {/* SEU TIME */}
+                {/* TIME 1 */}
 
                 <div
                   className="
@@ -1348,7 +1303,7 @@ export default function JogosPage() {
                   ×
                 </span>
 
-                {/* ADVERSÁRIO */}
+                {/* TIME 2 */}
 
                 <div
                   className="
@@ -1431,12 +1386,27 @@ export default function JogosPage() {
                   hover:bg-emerald-400
                 "
               >
-                Salvar resultado
+                Salvar placar
               </Button>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      {/* COMPARTILHAMENTO */}
+
+      <InstagramStoryDialog
+        open={openShare}
+        onOpenChange={(open) => {
+          setOpenShare(open);
+
+          if (!open) {
+            setShareGame(null);
+          }
+        }}
+        game={shareGame}
+      />
+
     </div>
   );
 }

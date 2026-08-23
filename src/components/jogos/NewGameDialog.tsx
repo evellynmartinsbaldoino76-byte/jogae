@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+
 interface Game {
   id: string;
   date: string;
@@ -59,15 +60,8 @@ interface NewGameDialogProps {
   initialTime?: string;
 }
 
-const horariosDisponiveis = [
-  "19:30",
-  "20:30",
-  "21:30",
-];
-
 export function NewGameDialog({
   teams,
-  games,
   onCreate,
   onUpdate,
   editingGame,
@@ -111,23 +105,6 @@ export function NewGameDialog({
     initialDate,
     initialTime,
   ]);
-
-  function horariosLivres() {
-    const ocupados = games
-      .filter(
-        (game) =>
-          game.date === date &&
-          game.id !== editingGame?.id
-      )
-      .map(
-        (game) => game.time
-      );
-
-    return horariosDisponiveis.filter(
-      (horario) =>
-        !ocupados.includes(horario)
-    );
-  }
 
   function handleSave() {
     if (!date || !time || !team) {
@@ -284,47 +261,19 @@ export function NewGameDialog({
               Horário
             </label>
 
-            <Select
+            <Input
+              type="time"
               value={time}
-              onValueChange={(value) =>
-                setTime(value ?? "")
-              }
+              onChange={(event) => setTime(event.target.value)}
               disabled={!date}
-            >
-              <SelectTrigger
-                className="
-                  h-11
-                  rounded-xl
-                  border-white/10
-                  bg-white/5
-                  text-white
-                "
-              >
-                <SelectValue
-                  placeholder="Escolha o horário"
-                />
-              </SelectTrigger>
-
-              <SelectContent
-                className="
-                  rounded-xl
-                  border-white/10
-                  bg-slate-950
-                  text-white
-                "
-              >
-                {horariosLivres().map(
-                  (horario) => (
-                    <SelectItem
-                      key={horario}
-                      value={horario}
-                    >
-                      {horario}
-                    </SelectItem>
-                  )
-                )}
-              </SelectContent>
-            </Select>
+              className="
+                h-11
+                rounded-xl
+                border-white/10
+                bg-white/5
+                text-white
+              "
+            />
           </div>
 
           {/* LOCAL */}
