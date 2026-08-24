@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
+import { ShieldCheck, Users } from "lucide-react";
 
 import { NewTeamDialog } from "@/components/times/NewTeamDialog";
 
@@ -80,6 +81,15 @@ export default function TimesPage() {
 
       <div
         className="
+          rounded-3xl
+          border
+          border-emerald-400/15
+          bg-gradient-to-r
+          from-emerald-500/10
+          to-transparent
+          px-6
+          py-7
+          sm:px-8
           flex
           flex-col
           gap-5
@@ -89,10 +99,11 @@ export default function TimesPage() {
         "
       >
         <div>
+          <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[.2em] text-emerald-400"><Users size={15} />Elencos</div>
           <h1
             className="
-              text-4xl
-              font-bold
+              text-3xl
+              font-black
               tracking-tight
               text-slate-100
             "
@@ -107,7 +118,7 @@ export default function TimesPage() {
               text-slate-400
             "
           >
-            {teams.length}{" "}
+            <span className="font-semibold text-emerald-300">{teams.length}</span>{" "}
             {teams.length === 1
               ? "time ativo"
               : "times ativos"}
@@ -254,7 +265,7 @@ export default function TimesPage() {
                       <CardTitle
                         className="
                           min-w-0
-                          truncate
+                          line-clamp-2
                           text-lg
                           font-bold
                           leading-tight
@@ -281,7 +292,7 @@ export default function TimesPage() {
                           shadow-none
                         "
                       >
-                        Ativo
+                        <ShieldCheck size={13} className="mr-1" />Ativo
                       </Badge>
 
                     </div>

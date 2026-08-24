@@ -635,9 +635,11 @@ export default function JogosPage() {
                   <div
                     className="
                       flex
-                      items-start
-                      justify-between
+                      flex-col
                       gap-4
+                      sm:flex-row
+                      sm:items-start
+                      sm:justify-between
                     "
                   >
 
@@ -702,14 +704,15 @@ export default function JogosPage() {
                           )}
                         </div>
 
-                        <span
-                          className="
-                            max-w-full
-                            truncate
-                            text-sm
-                            font-semibold
-                            text-slate-100
-                          "
+                          <span
+                            className="
+                              line-clamp-2
+                              max-w-full
+                              text-sm
+                              font-semibold
+                              leading-tight
+                              text-slate-100
+                            "
                         >
                           {game.team}
                         </span>
@@ -811,14 +814,15 @@ export default function JogosPage() {
                           )}
                         </div>
 
-                        <span
-                          className="
-                            max-w-full
-                            truncate
-                            text-sm
-                            font-semibold
-                            text-slate-100
-                          "
+                          <span
+                            className="
+                              line-clamp-2
+                              max-w-full
+                              text-sm
+                              font-semibold
+                              leading-tight
+                              text-slate-100
+                            "
                         >
                           {game.opponent}
                         </span>
@@ -829,7 +833,9 @@ export default function JogosPage() {
 
                     <Badge
                       className={`
-                        shrink-0
+                        w-fit
+                        self-center
+                        whitespace-nowrap
                         rounded-full
                         border
                         px-3

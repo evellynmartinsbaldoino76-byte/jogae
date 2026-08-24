@@ -155,7 +155,7 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
             <TeamMark shield={opponentShield} name={game.opponent} side="right" />
             {isFinished && (
               <>
-                <div className="absolute left-[33.5%] top-[49.5%] flex h-[108px] w-[108px] items-center justify-center rounded-full border-[4px] border-lime-400 bg-black/85 text-[68px] font-black leading-none text-white shadow-[0_0_22px_rgba(181,255,0,.35)]">{game.teamScore}</div>
+                <div className="absolute left-[31.5%] top-[49.5%] flex h-[108px] w-[108px] items-center justify-center rounded-full border-[4px] border-lime-400 bg-black/85 text-[68px] font-black leading-none text-white shadow-[0_0_22px_rgba(181,255,0,.35)]">{game.teamScore}</div>
                 <div className="absolute right-[31%] top-[49.5%] flex h-[108px] w-[108px] items-center justify-center rounded-full border-[4px] border-lime-400 bg-black/85 text-[68px] font-black leading-none text-white shadow-[0_0_22px_rgba(181,255,0,.35)]">{game.opponentScore}</div>
               </>
             )}
@@ -169,14 +169,14 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
 }
 
 function TeamMark({ shield, name, side }: { shield: string | null; name: string; side: "left" | "right" }) {
-  const position = side === "left" ? "left-[2%]" : "right-[2%]";
+  const position = side === "left" ? "-left-[2%]" : "-right-[2%]";
   return (
-    <div className={`absolute top-[40%] ${position} flex w-[31%] flex-col items-center text-center`}>
+    <div className={`absolute top-[40%] ${position} flex w-[34%] flex-col items-center text-center`}>
       <div className="flex h-[350px] w-[350px] items-center justify-center">
         {shield ? <img src={shield} alt="" crossOrigin="anonymous" className="h-[330px] w-[330px] object-contain drop-shadow-[0_12px_18px_rgba(0,0,0,.9)]" /> : <div className="flex h-[280px] w-[280px] items-center justify-center rounded-full border-4 border-lime-400 text-[110px]">⚽</div>}
       </div>
-      <div className="mt-4 flex h-[68px] w-[330px] items-center justify-center border-y-[3px] border-lime-400 bg-black/80 px-4 shadow-[0_0_18px_rgba(181,255,0,.18)]">
-        <span className="max-w-full truncate text-[36px] font-black uppercase leading-none text-white" style={{ textShadow: "0 4px 12px rgba(0,0,0,.95)" }}>{name}</span>
+      <div className="mt-4 flex min-h-[78px] w-[360px] items-center justify-center border-y-[3px] border-lime-400 bg-black/80 px-5 py-2 shadow-[0_0_18px_rgba(181,255,0,.18)]">
+        <span className="line-clamp-2 max-w-full text-[31px] font-black uppercase leading-[1.05] text-white" style={{ textShadow: "0 4px 12px rgba(0,0,0,.95)" }}>{name}</span>
       </div>
     </div>
   );
