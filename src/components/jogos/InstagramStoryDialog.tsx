@@ -30,6 +30,8 @@ interface Team {
 }
 
 const ART_SIZE = { width: 1080, height: 1920 };
+const FEED_SIZE = { width: 1080, height: 1350 };
+type PostFormat = "story" | "feed";
 
 function formatShortDate(date: string) {
   return new Date(`${date}T00:00:00`).toLocaleDateString("pt-BR", {
@@ -43,6 +45,7 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [format, setFormat] = useState<PostFormat>("story");
 
   // Partidas com placar usam o card de resultado; as demais usam Jogos de Hoje.
   const isFinished = game?.teamScore != null && game?.opponentScore != null;
@@ -62,6 +65,7 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
 
   const teamShield = game ? getShield(game.team) : null;
   const opponentShield = game ? getShield(game.opponent) : null;
+  const exportSize = format === "story" ? ART_SIZE : FEED_SIZE;
 
   useEffect(() => {
     if (!open || !game || !artworkRef.current) {
@@ -81,8 +85,8 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
           });
         });
         const image = await toPng(artworkRef.current, {
-          width: ART_SIZE.width,
-          height: ART_SIZE.height,
+          width: exportSize.width,
+          height: exportSize.height,
           pixelRatio: 1,
           cacheBust: true,
           backgroundColor: "#010101",
@@ -100,13 +104,13 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
       active = false;
       window.clearTimeout(timer);
     };
-  }, [open, game, template, teamShield, opponentShield]);
+  }, [open, game, template, teamShield, opponentShield, format, exportSize.width, exportSize.height]);
 
   function download() {
     if (!previewUrl || !game) return;
     const link = document.createElement("a");
     link.href = previewUrl;
-    link.download = `jogae-${isFinished ? "fim-de-jogo" : "jogos-de-hoje"}-${game.date}.png`;
+    link.download = `jogae-${isFinished ? "fim-de-jogo" : "jogos-de-hoje"}-${format}-${game.date}.png`;
     link.click();
   }
 
@@ -137,6 +141,10 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
             </div>
             <Button type="button" variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="rounded-full text-slate-400 hover:bg-white/10 hover:text-white"><X size={20} /></Button>
           </div>
+          <div className="flex shrink-0 gap-2 border-b border-white/10 px-6 py-3">
+            <Button type="button" size="sm" onClick={() => setFormat("story")} className={format === "story" ? "bg-lime-400 text-black hover:bg-lime-300" : "border border-white/10 bg-white/[.03] text-slate-300 hover:bg-white/10"}>Story <span className="ml-1 text-xs opacity-70">1080×1920</span></Button>
+            <Button type="button" size="sm" onClick={() => setFormat("feed")} className={format === "feed" ? "bg-lime-400 text-black hover:bg-lime-300" : "border border-white/10 bg-white/[.03] text-slate-300 hover:bg-white/10"}>Feed <span className="ml-1 text-xs opacity-70">1080×1350</span></Button>
+          </div>
           <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto bg-black p-6">
             {previewUrl ? <img src={previewUrl} alt="Pré-visualização da arte" className="max-h-[72vh] max-w-full rounded-2xl object-contain shadow-2xl" /> : <div className="text-sm text-slate-400">{generating ? "Gerando arte..." : "Preparando pré-visualização..."}</div>}
           </div>
@@ -148,7 +156,16 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
       </div>
 
       <div className="pointer-events-none fixed left-[-99999px] top-0" aria-hidden="true">
-        <div ref={artworkRef} className="relative overflow-hidden bg-black font-sans text-white" style={ART_SIZE}>
+        <div ref={artworkRef} className="relative overflow-hidden bg-black font-sans text-white" style={exportSize}>
+          {format === "feed" && <><img src={template} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-xl" /><div className="absolute inset-0 bg-black/65" /></>}
+          <div
+            className="absolute top-0 h-[1920px] w-[1080px]"
+            style={
+              format === "feed"
+                ? { left: "160px", zoom: 0.703125 }
+                : { left: "0" }
+            }
+          >
           <img src={template} alt="" className="absolute inset-0 h-full w-full object-cover" />
           <>
             <TeamMark shield={teamShield} name={game.team} side="left" />
@@ -162,6 +179,7 @@ export function InstagramStoryDialog({ game, open, onOpenChange }: StoryProps) {
             <div className="absolute left-[8%] top-[78.5%] w-[28%] text-center text-[50px] font-black tracking-[-.05em]">{formatShortDate(game.date)}</div>
             <div className="absolute left-[48%] top-[78.7%] w-[16%] text-center text-[44px] font-black tracking-[-.04em]">{game.time}</div>
           </>
+          </div>
         </div>
       </div>
     </>
