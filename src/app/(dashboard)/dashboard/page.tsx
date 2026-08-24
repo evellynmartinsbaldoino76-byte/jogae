@@ -4,7 +4,6 @@ import {
   CalendarDays,
   MapPin,
   Plus,
-  Trophy,
   Users,
 } from "lucide-react";
 
@@ -23,18 +22,15 @@ import { Button } from "@/components/ui/button";
 import { useGames } from "@/context/GamesContext";
 import { useTeams } from "@/context/TeamsContext";
 
-
 export default function DashboardPage() {
   const router = useRouter();
 
   const { games } = useGames();
   const { teams } = useTeams();
 
-
   const teamsCount = teams.length;
 
   const now = new Date();
-
 
   const futureGames = [...games]
     .filter((game) => {
@@ -59,7 +55,6 @@ export default function DashboardPage() {
       );
     });
 
-
   const nextGames =
     futureGames.length > 0
       ? futureGames.filter(
@@ -67,7 +62,6 @@ export default function DashboardPage() {
             game.date === futureGames[0].date
         )
       : [];
-
 
   function formatDate(date: string) {
     const formatted =
@@ -82,57 +76,93 @@ export default function DashboardPage() {
         }
       );
 
-
     return (
       formatted.charAt(0).toUpperCase() +
       formatted.slice(1)
     );
   }
 
+  /*
+   * ======================================================
+   * BUSCAR ESCUDO DO TIME
+   * ======================================================
+   */
+
+  function getTeamShield(
+    teamName: string
+  ) {
+    const normalizedName =
+      teamName
+        .trim()
+        .toLowerCase();
+
+    const team = teams.find(
+      (item) =>
+        item.name
+          .trim()
+          .toLowerCase() ===
+        normalizedName
+    );
+
+    return team?.shieldUrl ?? null;
+  }
 
   function novoJogo() {
     router.push("/jogos");
   }
-
 
   return (
     <main
       className="
         min-h-screen
         bg-gradient-to-br
-        from-emerald-950
-        via-slate-950
-        to-blue-950
-        px-6
-        pb-10
-        pt-10
-        md:pt-12
+        from-[#071b1a]
+        via-[#091522]
+        to-[#10142d]
+        px-4
+        pb-12
+        pt-6
+        sm:px-6
+        lg:px-10
+        lg:pt-10
       "
     >
-
       <div
         className="
           mx-auto
           max-w-7xl
-          space-y-10
+          space-y-7
         "
       >
-
-
+        {/* ================================================== */}
         {/* CABEÇALHO */}
-        <div
+        {/* ================================================== */}
+
+        <section
           className="
+            relative
+            overflow-hidden
             flex
             flex-col
             gap-6
+            rounded-3xl
+            border
+            border-emerald-400/15
+            bg-gradient-to-br
+            from-emerald-500/15
+            via-[#0b1c25]
+            to-[#0d1126]
+            px-6
+            py-8
+            shadow-[0_18px_60px_rgba(0,0,0,0.26)]
+            sm:px-9
             lg:flex-row
             lg:items-end
             lg:justify-between
           "
         >
-
-          <div>
-
+          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-emerald-400/10 blur-3xl" />
+          <div className="relative">
             <p
               className="
                 mb-3
@@ -143,9 +173,8 @@ export default function DashboardPage() {
                 text-emerald-400
               "
             >
-              Painel de controle
+              Visão geral
             </p>
-
 
             <h1
               className="
@@ -156,9 +185,8 @@ export default function DashboardPage() {
                 md:text-5xl
               "
             >
-              Olá!
+              Olá, organizador.
             </h1>
-
 
             <p
               className="
@@ -169,18 +197,17 @@ export default function DashboardPage() {
                 text-slate-300
               "
             >
-              Bem-vindo ao painel de controle do Jogaê.
+              Acompanhe seus jogos, times e próximas partidas em um único lugar.
             </p>
-
           </div>
-
 
           <Button
             size="lg"
             onClick={novoJogo}
-            className="
+            className="relative
               group
               w-full
+              rounded-xl
               bg-emerald-500
               font-bold
               text-black
@@ -192,7 +219,6 @@ export default function DashboardPage() {
               lg:w-auto
             "
           >
-
             <Plus
               size={20}
               className="
@@ -203,23 +229,21 @@ export default function DashboardPage() {
             />
 
             Agendar novo jogo
-
           </Button>
+        </section>
 
-
-        </div>
-
-
-
+        {/* ================================================== */}
         {/* CARDS */}
+        {/* ================================================== */}
+
         <div
           className="
             grid
-            gap-5
+            gap-4
             md:grid-cols-3
           "
         >
-
+          {/* JOGOS */}
 
           <Card
             onClick={() =>
@@ -228,26 +252,26 @@ export default function DashboardPage() {
             className="
               cursor-pointer
               border-white/10
-              bg-white/5
+              bg-[#0a1720]/90
               text-white
+              shadow-[0_12px_30px_rgba(0,0,0,0.18)]
+              transition-all
+              hover:-translate-y-1
+              hover:border-emerald-400/35
             "
           >
-
-            <CardHeader>
-
-              <CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-semibold text-slate-300">
                 Jogos
               </CardTitle>
-
+              <div className="rounded-xl bg-emerald-400/10 p-2.5 text-emerald-300"><CalendarDays size={19} /></div>
             </CardHeader>
 
-
             <CardContent>
-
               <p
                 className="
                   text-5xl
-                  font-bold
+                  font-black
                 "
               >
                 {games.length}
@@ -256,13 +280,10 @@ export default function DashboardPage() {
               <p className="mt-3 text-slate-400">
                 Jogos cadastrados
               </p>
-
             </CardContent>
-
-
           </Card>
 
-
+          {/* TIMES */}
 
           <Card
             onClick={() =>
@@ -271,26 +292,26 @@ export default function DashboardPage() {
             className="
               cursor-pointer
               border-white/10
-              bg-white/5
+              bg-[#0a1720]/90
               text-white
+              shadow-[0_12px_30px_rgba(0,0,0,0.18)]
+              transition-all
+              hover:-translate-y-1
+              hover:border-sky-400/35
             "
           >
-
-            <CardHeader>
-
-              <CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-semibold text-slate-300">
                 Meus times
               </CardTitle>
-
+              <div className="rounded-xl bg-sky-400/10 p-2.5 text-sky-300"><Users size={19} /></div>
             </CardHeader>
 
-
             <CardContent>
-
               <p
                 className="
                   text-5xl
-                  font-bold
+                  font-black
                 "
               >
                 {teamsCount}
@@ -299,34 +320,27 @@ export default function DashboardPage() {
               <p className="mt-3 text-slate-400">
                 Times cadastrados
               </p>
-
             </CardContent>
-
-
           </Card>
 
-
-
+          {/* LOCAL */}
 
           <Card
             className="
               border-white/10
-              bg-white/5
+              bg-[#0a1720]/90
               text-white
+              shadow-[0_12px_30px_rgba(0,0,0,0.18)]
             "
           >
-
-            <CardHeader>
-
-              <CardTitle>
-                Local
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-semibold text-slate-300">
+                Local principal
               </CardTitle>
-
+              <div className="rounded-xl bg-violet-400/10 p-2.5 text-violet-300"><MapPin size={19} /></div>
             </CardHeader>
 
-
             <CardContent>
-
               <p className="text-xl font-bold">
                 Associação da Polícia
               </p>
@@ -334,39 +348,35 @@ export default function DashboardPage() {
               <p className="mt-3 text-slate-400">
                 Campo fixo
               </p>
-
             </CardContent>
-
           </Card>
-
-
         </div>
 
-
-
+        {/* ================================================== */}
         {/* PRÓXIMOS JOGOS */}
+        {/* ================================================== */}
+
         <Card
           className="
+            rounded-3xl
             border-white/10
-            bg-white/5
+            bg-[#0a1720]/90
             text-white
+            shadow-[0_16px_45px_rgba(0,0,0,0.20)]
           "
         >
-
-          <CardHeader>
-
-            <CardTitle>
-              Próximas Partidas
-            </CardTitle>
-
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-emerald-400">Agenda</p>
+              <CardTitle className="mt-1 text-2xl">
+                Próximas Partidas
+              </CardTitle>
+            </div>
+            <Button variant="ghost" onClick={() => router.push("/jogos")} className="rounded-xl text-slate-300 hover:bg-white/5 hover:text-emerald-300">Ver jogos</Button>
           </CardHeader>
 
-
-
           <CardContent>
-
             {nextGames.length > 0 ? (
-
               <div
                 className="
                   grid
@@ -374,91 +384,169 @@ export default function DashboardPage() {
                   md:grid-cols-2
                 "
               >
+                {nextGames.map((game) => {
+                  const teamShield =
+                    getTeamShield(
+                      game.team
+                    );
 
-                {nextGames.map((game)=>(
+                  const opponentShield =
+                    getTeamShield(
+                      game.opponent
+                    );
 
-                  <div
-                    key={game.id}
-                    className="
-                      rounded-2xl
-                      border
-                      border-white/10
-                      bg-black/20
-                      p-5
-                    "
-                  >
-
-                    <Badge>
-                      {game.status}
-                    </Badge>
-
-
-                    <h2
+                  return (
+                    <div
+                      key={game.id}
                       className="
-                        mt-5
-                        text-xl
-                        font-bold
-                        text-center
+                        rounded-2xl
+                        border
+                        border-white/10
+                        bg-gradient-to-br
+                        from-white/[0.055]
+                        to-transparent
+                        p-5
+                        transition-all
+                        hover:border-emerald-400/30
                       "
                     >
+                      <Badge>
+                        {game.status}
+                      </Badge>
 
-                      {game.team}
+                      {/* ================================================== */}
+                      {/* TIMES + ESCUDOS */}
+                      {/* ================================================== */}
 
-                      <span className="mx-2 text-emerald-400">
-                        X
-                      </span>
+                      <div
+                        className="
+                          mt-5
+                          flex
+                          items-center
+                          justify-center
+                          gap-5
+                        "
+                      >
+                        {/* TIME DA ESQUERDA */}
 
-                      {game.opponent}
+                        <div
+                          className="
+                            flex
+                            min-w-0
+                            flex-1
+                            items-center
+                            justify-end
+                            gap-3
+                          "
+                        >
+                          <span
+                            className="
+                              text-right
+                              text-xl
+                              font-bold
+                              leading-tight
+                            "
+                          >
+                            {game.team}
+                          </span>
 
-                    </h2>
+                          {teamShield && (
+                            <img
+                              src={teamShield}
+                              alt={`Escudo ${game.team}`}
+                              className="
+                                h-12
+                                w-12
+                                shrink-0
+                                object-contain
+                              "
+                            />
+                          )}
+                        </div>
 
+                        {/* X */}
 
-                    <div className="mt-5 space-y-3">
+                        <span
+                          className="
+                            shrink-0
+                            text-xl
+                            font-black
+                            text-emerald-400
+                          "
+                        >
+                          X
+                        </span>
 
-                      <p>
-                        📅 {formatDate(game.date)}
-                      </p>
+                        {/* TIME DA DIREITA */}
 
+                        <div
+                          className="
+                            flex
+                            min-w-0
+                            flex-1
+                            items-center
+                            justify-start
+                            gap-3
+                          "
+                        >
+                          {opponentShield && (
+                            <img
+                              src={opponentShield}
+                              alt={`Escudo ${game.opponent}`}
+                              className="
+                                h-12
+                                w-12
+                                shrink-0
+                                object-contain
+                              "
+                            />
+                          )}
 
-                      <p>
-                        🕒 {game.time}
-                      </p>
+                          <span
+                            className="
+                              text-left
+                              text-xl
+                              font-bold
+                              leading-tight
+                            "
+                          >
+                            {game.opponent}
+                          </span>
+                        </div>
+                      </div>
 
+                      {/* ================================================== */}
+                      {/* INFORMAÇÕES DO JOGO */}
+                      {/* ================================================== */}
 
-                      <p>
-                        📍 {game.field}
-                      </p>
+                      <div className="mt-5 space-y-3">
+                        <p>
+                          📅{" "}
+                          {formatDate(
+                            game.date
+                          )}
+                        </p>
 
+                        <p>
+                          🕒 {game.time}
+                        </p>
 
+                        <p>
+                          📍 {game.field}
+                        </p>
+                      </div>
                     </div>
-
-
-                  </div>
-
-                ))}
-
-
+                  );
+                })}
               </div>
-
-
             ) : (
-
               <p className="text-slate-400">
                 Nenhum jogo futuro agendado.
               </p>
-
             )}
-
-
           </CardContent>
-
-
         </Card>
-
-
       </div>
-
-
     </main>
   );
 }
